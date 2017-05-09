@@ -22,10 +22,10 @@ public class BitGoClientImpl implements BitGoClient {
     private final Logger log = LoggerFactory.getLogger(getClass());
     /** The base URL (host, port, up to api/v1 for example */
     @Setter @Getter
-    private String baseUrl;
+    private String baseUrl = "http://localhost:3080/api/v1";
     /** The URL for "sendmany" endpoint (must include anything that's appended to baseUrl). */
     @Setter @Getter
-    private String sendManyUrl;
+    private String sendManyUrl = "wallet/sendmany";
     private String longLivedToken;
 
     public BitGoClientImpl(String longLivedToken) {
@@ -48,7 +48,7 @@ public class BitGoClientImpl implements BitGoClient {
                                                 BigDecimal fee, BigDecimal feeTxConfirmTarget,
                                                 int minConfirms, boolean enforceMinConfirmsForChange)
             throws IOException {
-        String url = baseUrl + "/" + sendManyUrl;
+        String url = baseUrl + sendManyUrl;
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
