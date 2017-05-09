@@ -73,6 +73,8 @@ public class HttpHelper {
                 buf = null;
             }
         }
-        return (Map<String,Object>)JSON.parse(buf);
+        @SuppressWarnings("unchecked")
+        Map<String,Object> rmap = (Map<String,Object>)JSON.parse(buf);
+        return rmap;
     }
 }
