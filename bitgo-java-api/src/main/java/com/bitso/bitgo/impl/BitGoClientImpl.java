@@ -25,7 +25,7 @@ public class BitGoClientImpl implements BitGoClient {
     private String baseUrl = "http://localhost:3080/api/v1";
     /** The URL for "sendmany" endpoint (must include anything that's appended to baseUrl). */
     @Setter @Getter
-    private String sendManyUrl = "wallet/sendmany";
+    private String sendManyUrl = "/wallet/sendmany";
     private String longLivedToken;
 
     public BitGoClientImpl(String longLivedToken) {
