@@ -1,0 +1,14 @@
+apply plugin:'java'
+apply plugin:'idea'
+version='0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.16.16'
+    compile 'org.slf4j:slf4j-api:1.7.25',
+            'com.alibaba:fastjson:1.2.31'
+    testCompile 'junit:junit:4.12'
+}
