@@ -2,6 +2,7 @@ package com.bitso.bitgo;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,6 +16,12 @@ public interface BitGoClient {
 
     Optional<String> login(String email, String password, String otp, boolean extensible)
             throws IOException;
+
+    /** Get all wallets for the user. */
+    List<Wallet> getWallets();
+
+    /** Get the wallet with specified ID. */
+    Optional<Wallet> getWallet(String wid);
 
     /** Invokes the sendmany method.
      * @param recipients A map with the recipients' addresses as keys and the corresponding

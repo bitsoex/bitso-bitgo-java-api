@@ -2,6 +2,7 @@ package com.bitso.bitgo.impl;
 
 import com.bitso.bitgo.BitGoClient;
 import com.bitso.bitgo.SendCoinsResponse;
+import com.bitso.bitgo.Wallet;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -108,5 +109,12 @@ public class BitGoClientImpl implements BitGoClient {
         return Optional.empty();
     }
 
+    public List<Wallet> getWallets() {
+        return Collections.emptyList();
+    }
+
+    public Optional<Wallet> getWallet(String wid) {
+        return Optional.empty();
+    }
 
 }
