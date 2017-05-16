@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 public class Wallet {
 
     @Setter @Getter
+    private String id;
+    @Setter @Getter
     private BigDecimal balance;
     @Setter @Getter
     private BigDecimal confirmedBalance;
