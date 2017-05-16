@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the BitGo client.
@@ -27,6 +30,10 @@ public class BitGoClientImpl implements BitGoClient {
     /** The URL for "sendmany" endpoint (must include anything that's appended to baseUrl). */
     @Setter @Getter
     private String sendManyUrl = "/wallet/sendmany";
+    @Setter @Getter
+    private String listWalletsUrl = "/wallet";
+    @Setter @Getter
+    private String getWalletUrl = "/wallet/";
     private String longLivedToken;
 
     public BitGoClientImpl(String longLivedToken) {
@@ -109,12 +116,52 @@ public class BitGoClientImpl implements BitGoClient {
         return Optional.empty();
     }
 
-    public List<Wallet> getWallets() {
-        return Collections.emptyList();
+    public List<Wallet> getWallets() throws IOException {
+        String url = baseUrl + listWalletsUrl;
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        @SuppressWarnings("unchecked")
+        List<Map<String,Object>> jsw = (List<Map<String,Object>>)resp.get("wallets");
+        if (jsw == null) {
+            return Collections.emptyList();
+        }
+        return jsw.stream().map(BitGoClientImpl::fromMap).collect(Collectors.toList());
     }
 
-    public Optional<Wallet> getWallet(String wid) {
+    public Optional<Wallet> getWallet(String wid) throws IOException {
+        String url = baseUrl + getWalletUrl + wid;
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        if (resp != null && resp.containsKey("id") && resp.containsKey("balance")
+                && resp.containsKey("confirmedBalance")) {
+            return Optional.of(fromMap(resp));
+        }
         return Optional.empty();
     }
 
+    private static Wallet fromMap(Map<String,Object> map) {
+        Wallet w = new Wallet();
+        w.setId((String)map.get("id"));
+        w.setBalance(Conversions.satoshiToBitcoin((long)map.getOrDefault("balance", 0l)));
+        w.setConfirmedBalance(Conversions.satoshiToBitcoin((long)map.getOrDefault("confirmedBalance", 0l)));
+        return w;
+    }
 }

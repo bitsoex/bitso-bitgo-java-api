@@ -18,10 +18,10 @@ public interface BitGoClient {
             throws IOException;
 
     /** Get all wallets for the user. */
-    List<Wallet> getWallets();
+    List<Wallet> getWallets() throws IOException;
 
     /** Get the wallet with specified ID. */
-    Optional<Wallet> getWallet(String wid);
+    Optional<Wallet> getWallet(String wid) throws IOException;
 
     /** Invokes the sendmany method.
      * @param recipients A map with the recipients' addresses as keys and the corresponding
