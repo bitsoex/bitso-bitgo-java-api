@@ -43,7 +43,7 @@ public class TestClient {
         Map<String,BigDecimal> targets = new HashMap<>();
         targets.put("[ADDRESS1]", new BigDecimal("0.001"));
         targets.put("[ADDRESS2]", new BigDecimal("0.001"));
-        Optional<SendCoinsResponse> resp = client.sendMany(targets, null,
+        Optional<SendCoinsResponse> resp = client.sendMany( "wallet", "pass", targets, null,
                 "test", null, null, 1, true);
         Assert.assertTrue(resp.isPresent());
         Assert.assertNotNull(resp.get().getTx());

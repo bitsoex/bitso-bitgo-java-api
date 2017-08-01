@@ -24,6 +24,8 @@ public interface BitGoClient {
     Optional<Wallet> getWallet(String wid) throws IOException;
 
     /** Invokes the sendmany method.
+     * @param walletId The ID of the source wallet.
+     * @param walletPass The wallet passphrase.
      * @param recipients A map with the recipients' addresses as keys and the corresponding
      * amounts as values. Amounts are in BTC.
      * @param sequenceId A unique identifier for this transaction (optional).
@@ -34,10 +36,11 @@ public interface BitGoClient {
      * @param enforceMinConfirmsForChange Defaults to false. When constructing a transaction, minConfirms will only be enforced for unspents not originating from the wallet
      * @return A SendCoinsResponse, or empty if there was a problem (although more likely in case of a problem it will throw).
      */
-    Optional<SendCoinsResponse> sendMany(Map<String,BigDecimal> recipients,
-                                        String sequenceId, String message,
-                                        BigDecimal fee, BigDecimal feeTxConfirmTarget,
-                                        int minConfirms, boolean enforceMinConfirmsForChange)
+    Optional<SendCoinsResponse> sendMany(String walletId, String walletPass,
+                                         Map<String,BigDecimal> recipients,
+                                         String sequenceId, String message,
+                                         BigDecimal fee, BigDecimal feeTxConfirmTarget,
+                                         int minConfirms, boolean enforceMinConfirmsForChange)
             throws IOException;
 
 }

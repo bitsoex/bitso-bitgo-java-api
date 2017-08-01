@@ -29,7 +29,7 @@ public class BitGoClientImpl implements BitGoClient {
     private String baseUrl = "http://localhost:3080/api/v1";
     /** The URL for "sendmany" endpoint (must include anything that's appended to baseUrl). */
     @Setter @Getter
-    private String sendManyUrl = "/wallet/sendmany";
+    private String sendManyUrl = "/wallet/$WALLET/sendmany";
     @Setter @Getter
     private String listWalletsUrl = "/wallet";
     @Setter @Getter
@@ -51,12 +51,13 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<SendCoinsResponse> sendMany(Map<String, BigDecimal> recipients,
+    public Optional<SendCoinsResponse> sendMany(String walletId, String walletPass,
+                                                Map<String, BigDecimal> recipients,
                                                 String sequenceId, String message,
                                                 BigDecimal fee, BigDecimal feeTxConfirmTarget,
                                                 int minConfirms, boolean enforceMinConfirmsForChange)
             throws IOException {
-        String url = baseUrl + sendManyUrl;
+        String url = baseUrl + sendManyUrl.replace("$WALLET", walletId);
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
@@ -74,6 +75,7 @@ public class BitGoClientImpl implements BitGoClient {
         }
         final Map<String, Object> data = new HashMap<>();
         data.put("recipients", addr);
+        data.put("walletPassphrase", walletPass);
         if (message != null) {
             data.put("message", message);
         }
@@ -92,6 +94,7 @@ public class BitGoClientImpl implements BitGoClient {
         }
         data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
         Map<String,Object> resp = HttpHelper.readResponse(HttpHelper.post(url, data, auth));
+        log.trace("sendMany response: {}", resp);
         if (resp.containsKey("error") || resp.containsKey("tx")) {
             SendCoinsResponse r = new SendCoinsResponse();
             r.setTx((String)resp.get("tx"));
@@ -129,6 +132,7 @@ public class BitGoClientImpl implements BitGoClient {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
         Map<String,Object> resp = HttpHelper.readResponse(conn);
+        log.trace("Wallets response: {}", resp);
         @SuppressWarnings("unchecked")
         List<Map<String,Object>> jsw = (List<Map<String,Object>>)resp.get("wallets");
         if (jsw == null) {
@@ -150,6 +154,7 @@ public class BitGoClientImpl implements BitGoClient {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
         Map<String,Object> resp = HttpHelper.readResponse(conn);
+        log.trace("Wallet {} response: {}", wid, resp);
         if (resp != null && resp.containsKey("id") && resp.containsKey("balance")
                 && resp.containsKey("confirmedBalance")) {
             return Optional.of(fromMap(resp));
@@ -160,8 +165,25 @@ public class BitGoClientImpl implements BitGoClient {
     private static Wallet fromMap(Map<String,Object> map) {
         Wallet w = new Wallet();
         w.setId((String)map.get("id"));
-        w.setBalance(Conversions.satoshiToBitcoin((long)map.getOrDefault("balance", 0l)));
-        w.setConfirmedBalance(Conversions.satoshiToBitcoin((long)map.getOrDefault("confirmedBalance", 0l)));
+        if (map.containsKey("balance")) {
+            w.setBalance(Conversions.satoshiToBitcoin(((Number)map.get("balance")).longValue()));
+        }
+        if (map.containsKey("confirmedBalance")) {
+            w.setConfirmedBalance(Conversions.satoshiToBitcoin(
+                    ((Number)map.get("confirmedBalance")).longValue()));
+        }
+        if (map.containsKey("spendableBalance")) {
+            w.setSpendableBalance(Conversions.satoshiToBitcoin(
+                    ((Number)map.get("spendableBalance")).longValue()));
+        }
+        if (map.containsKey("spendableConfirmedBalance")) {
+            w.setSpendableConfirmedBalance(Conversions.satoshiToBitcoin(
+                    ((Number)map.get("spendableConfirmedBalance")).longValue()));
+        }
+        if (map.containsKey("instantBalance")) {
+            w.setInstantBalance(Conversions.satoshiToBitcoin(
+                    ((Number)map.get("instantBalance")).longValue()));
+        }
         return w;
     }
 }
