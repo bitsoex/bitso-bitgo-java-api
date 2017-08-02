@@ -12,7 +12,7 @@ import lombok.Setter;
 public abstract class AbstractResponse {
 
     @Setter @Getter
-    private int status;
+    private String status;
     @Setter @Getter
     private String error;
 }

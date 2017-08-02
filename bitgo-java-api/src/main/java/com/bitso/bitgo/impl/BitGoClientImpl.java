@@ -75,7 +75,6 @@ public class BitGoClientImpl implements BitGoClient {
         }
         final Map<String, Object> data = new HashMap<>();
         data.put("recipients", addr);
-        data.put("walletPassphrase", walletPass);
         if (message != null) {
             data.put("message", message);
         }
@@ -93,6 +92,8 @@ public class BitGoClientImpl implements BitGoClient {
             data.put("minConfirms", minConfirms);
         }
         data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
+        log.trace("sendMany {}", data);
+        data.put("walletPassphrase", walletPass);
         Map<String,Object> resp = HttpHelper.readResponse(HttpHelper.post(url, data, auth));
         log.trace("sendMany response: {}", resp);
         if (resp.containsKey("error") || resp.containsKey("tx")) {
@@ -101,19 +102,15 @@ public class BitGoClientImpl implements BitGoClient {
             r.setHash((String)resp.get("hash"));
             r.setError((String)resp.get("error"));
             r.setPendingApproval((String)resp.get("pendingApproval"));
-            r.setOtp((Boolean)resp.get("otp"));
+            r.setOtp((Boolean)resp.getOrDefault("otp", false));
             r.setTriggeredPolicy((String)resp.get("triggeredPolicy"));
-            if (resp.containsKey("status")) {
-                r.setStatus((int)resp.get("status"));
-            }
+            r.setStatus((String)resp.get("status"));
             //convert from satoshis
-            if (resp.containsKey("fee")) {
-                r.setFee(Conversions.satoshiToBitcoin((Long)resp.get("fee")));
-            }
+            r.setFee(Conversions.satoshiToBitcoin(((Number)resp.getOrDefault(
+                    "fee", 0)).longValue()));
             //convert from satoshis
-            if (resp.containsKey("feeRate")) {
-                r.setFeeRate(Conversions.satoshiToBitcoin((Long)resp.get("feeRate")));
-            }
+            r.setFeeRate(Conversions.satoshiToBitcoin(((Number)resp.getOrDefault(
+                    "feeRate", 0)).longValue()));
             return Optional.of(r);
         }
         return Optional.empty();
