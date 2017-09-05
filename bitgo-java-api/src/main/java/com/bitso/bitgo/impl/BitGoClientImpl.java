@@ -35,6 +35,8 @@ public class BitGoClientImpl implements BitGoClient {
     @Setter @Getter
     private String getWalletUrl = "/wallet/";
     private String longLivedToken;
+    @Setter @Getter
+    private boolean unsafe;
 
     public BitGoClientImpl(String longLivedToken) {
         this.longLivedToken = longLivedToken;
@@ -94,7 +96,11 @@ public class BitGoClientImpl implements BitGoClient {
         data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
         log.trace("sendMany {}", data);
         data.put("walletPassphrase", walletPass);
-        Map<String,Object> resp = HttpHelper.readResponse(HttpHelper.post(url, data, auth));
+        HttpURLConnection conn = unsafe ? HttpHelper.postUnsafe(url, data, auth) : HttpHelper.post(url, data, auth);
+        if (conn == null) {
+            return Optional.empty();
+        }
+        Map<String,Object> resp = HttpHelper.readResponse(conn);
         log.trace("sendMany response: {}", resp);
         if (resp.containsKey("error") || resp.containsKey("tx")) {
             SendCoinsResponse r = new SendCoinsResponse();
