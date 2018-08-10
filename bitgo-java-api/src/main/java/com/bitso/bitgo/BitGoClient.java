@@ -54,10 +54,11 @@ public interface BitGoClient {
      * See https://www.bitgo.com/api/v2/#get-wallet-transfer
      * @param coin
      * @param walletId
+     * @param walletTransferId
      * @return
      * @throws IOException
      */
-    Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId) throws IOException;
+    Optional<Map<String, Object>> getWalletTransferId(String coin, String walletId, String walletTransferId) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#get-wallet-transfer-by-sequence-id
@@ -66,8 +67,7 @@ public interface BitGoClient {
      * @param sequenceId
      * @throws IOException
      */
-    Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId, String sequenceId) throws IOException;
-
+    Optional<Map<String, Object>> getWalletTransferSeqId(String coin, String walletId, String sequenceId) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#unlock

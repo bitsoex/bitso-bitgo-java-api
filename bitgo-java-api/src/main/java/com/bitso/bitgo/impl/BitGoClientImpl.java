@@ -33,7 +33,7 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String LIST_WALLETS_URL = "/$COIN/wallet";
     private static final String GET_WALLET_URL = "/$COIN/wallet/";
     private static final String CURRENT_USER_PROFILE_URL = "/user/me";
-    private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer";
+    private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer/$TRANSFER";
     private static final String GET_WALLET_TXN_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
     private static final String UNLOCK_URL = "/user/unlock";
 
@@ -194,8 +194,8 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId) throws IOException {
-        String url = baseUrl + GET_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+    public Optional<Map<String, Object>> getWalletTransferId(String coin, String walletId, String walletTransferId) throws IOException {
+        String url = baseUrl + GET_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$TRANSFER", walletTransferId);
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
@@ -213,7 +213,7 @@ public class BitGoClientImpl implements BitGoClient {
 
 
     @Override
-    public Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId, String sequenceId) throws IOException {
+    public Optional<Map<String, Object>> getWalletTransferSeqId(String coin, String walletId, String sequenceId) throws IOException {
         String url = baseUrl + GET_WALLET_TXN_SEQ_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$SEQUENCE", sequenceId);
         final String auth;
         if (longLivedToken == null) {
