@@ -32,6 +32,8 @@ public class HttpHelper {
 
         URL u = new URL(url);
         HttpURLConnection conn = (HttpURLConnection)u.openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
         post(conn, auth, bout.toByteArray());
         return conn;
     }
@@ -43,6 +45,8 @@ public class HttpHelper {
 
         URL u = new URL(url);
         HttpURLConnection cc = (HttpURLConnection)u.openConnection();
+        cc.setRequestProperty("Content-Type", "application/json");
+        cc.setRequestProperty("Authorization", "Bearer " + auth);
         if (cc instanceof HttpsURLConnection) {
             HttpsURLConnection conn = (HttpsURLConnection)cc;
             try {

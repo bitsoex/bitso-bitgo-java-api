@@ -24,16 +24,18 @@ import java.util.stream.Collectors;
 public class BitGoClientImpl implements BitGoClient {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+
     /** The base URL (host, port, up to api/v1 for example */
-    @Setter @Getter
-    private String baseUrl = "http://localhost:3080/api/v1";
+    @Getter @Setter
+    private String baseUrl = "http://localhost:3080/api/v2";
     /** The URL for "sendmany" endpoint (must include anything that's appended to baseUrl). */
-    @Setter @Getter
-    private String sendManyUrl = "/wallet/$WALLET/sendmany";
-    @Setter @Getter
-    private String listWalletsUrl = "/wallet";
-    @Setter @Getter
-    private String getWalletUrl = "/wallet/";
+    private static final String SEND_MANY_URL = "/$COIN/wallet/$WALLET/sendmany";
+    private static final String LIST_WALLETS_URL = "/$COIN/wallet";
+    private static final String GET_WALLET_URL = "/$COIN/wallet/";
+    private static final String CURRENT_USER_PROFILE_URL = "/user/me";
+    private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
+    private static final String UNLOCK_URL = "/user/unlock";
+
     private String longLivedToken;
     @Setter @Getter
     private boolean unsafe;
@@ -53,13 +55,13 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<SendCoinsResponse> sendMany(String walletId, String walletPass,
+    public Optional<SendCoinsResponse> sendMany(String coin, String walletId, String walletPass,
                                                 Map<String, BigDecimal> recipients,
                                                 String sequenceId, String message,
                                                 BigDecimal fee, BigDecimal feeTxConfirmTarget,
                                                 int minConfirms, boolean enforceMinConfirmsForChange)
             throws IOException {
-        String url = baseUrl + sendManyUrl.replace("$WALLET", walletId);
+        String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
@@ -71,8 +73,7 @@ public class BitGoClientImpl implements BitGoClient {
         for (Map.Entry<String, BigDecimal> e : recipients.entrySet()) {
             Map<String, Object> a = new HashMap<>(2);
             a.put("address", e.getKey());
-            //convert to satoshis
-            a.put("amount", e.getValue().movePointRight(8).longValue());
+            a.put("amount", e.getValue().longValue());
             addr.add(a);
         }
         final Map<String, Object> data = new HashMap<>();
@@ -84,8 +85,7 @@ public class BitGoClientImpl implements BitGoClient {
             data.put("sequenceId", sequenceId);
         }
         if (fee != null) {
-            //convert to satoshis
-            data.put("fee", fee.movePointRight(8).longValue());
+            data.put("fee", fee.longValue());
         }
         if (feeTxConfirmTarget != null) {
             data.put("feeTxConfirmTarget", feeTxConfirmTarget);
@@ -94,11 +94,18 @@ public class BitGoClientImpl implements BitGoClient {
             data.put("minConfirms", minConfirms);
         }
         data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
-        log.trace("sendMany {}", data);
+        log.info("sendMany {}", data);
         data.put("walletPassphrase", walletPass);
         HttpURLConnection conn = unsafe ? HttpHelper.postUnsafe(url, data, auth) : HttpHelper.post(url, data, auth);
         if (conn == null) {
             return Optional.empty();
+        }
+        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK){
+            SendCoinsResponse errorResponse = new SendCoinsResponse();
+            errorResponse.setResponseCode(conn.getResponseCode());
+            errorResponse.setError(new Scanner(conn.getErrorStream(),"UTF-8").useDelimiter("\r\n").next());
+            log.error("Got error: {}", errorResponse.getError());
+            return Optional.of(errorResponse);
         }
         Map<String,Object> resp = HttpHelper.readResponse(conn);
         log.trace("sendMany response: {}", resp);
@@ -122,8 +129,9 @@ public class BitGoClientImpl implements BitGoClient {
         return Optional.empty();
     }
 
-    public List<Wallet> getWallets() throws IOException {
-        String url = baseUrl + listWalletsUrl;
+    @Override
+    public List<Wallet> listWallets(String coin) throws IOException {
+        String url = baseUrl + LIST_WALLETS_URL.replace("$COIN", coin);
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
@@ -144,8 +152,9 @@ public class BitGoClientImpl implements BitGoClient {
         return jsw.stream().map(BitGoClientImpl::fromMap).collect(Collectors.toList());
     }
 
-    public Optional<Wallet> getWallet(String wid) throws IOException {
-        String url = baseUrl + getWalletUrl + wid;
+    @Override
+    public Optional<Wallet> getWallet(String coin, String wid) throws IOException {
+        String url = baseUrl + GET_WALLET_URL.replace("$COIN", coin) + wid;
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
@@ -163,6 +172,63 @@ public class BitGoClientImpl implements BitGoClient {
             return Optional.of(fromMap(resp));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<Map<String, Object>> getCurrentUserProfile() throws IOException{
+        String url = baseUrl + CURRENT_USER_PROFILE_URL;
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        log.trace("getCurrentUserProfile response: {}", resp);
+        return Optional.of(resp);
+    }
+
+    @Override
+    public Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId, String sequenceId) throws IOException {
+        String url = baseUrl + GET_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$SEQUENCE", sequenceId);
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        log.trace("getCurrentUserProfile response: {}", resp);
+        return Optional.of(resp);
+    }
+
+    @Override
+    public int unlock(String otp, Long duration) throws IOException {
+        String url = baseUrl + UNLOCK_URL;
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+
+        final Map<String, Object> data = new HashMap<>();
+        data.put("otp", otp);
+        if (duration != null) {
+            data.put("duration", duration);
+        }
+
+        HttpURLConnection conn = unsafe ? HttpHelper.postUnsafe(url, data, auth) : HttpHelper.post(url, data, auth);
+        return conn.getResponseCode();
     }
 
     private static Wallet fromMap(Map<String,Object> map) {
