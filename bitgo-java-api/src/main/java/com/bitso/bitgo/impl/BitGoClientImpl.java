@@ -33,7 +33,8 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String LIST_WALLETS_URL = "/$COIN/wallet";
     private static final String GET_WALLET_URL = "/$COIN/wallet/";
     private static final String CURRENT_USER_PROFILE_URL = "/user/me";
-    private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
+    private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer";
+    private static final String GET_WALLET_TXN_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
     private static final String UNLOCK_URL = "/user/unlock";
 
     private String longLivedToken;
@@ -193,8 +194,27 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
+    public Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId) throws IOException {
+        String url = baseUrl + GET_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        log.trace("getCurrentUserProfile response: {}", resp);
+        return Optional.of(resp);
+    }
+
+
+    @Override
     public Optional<Map<String, Object>> getWalletTransfer(String coin, String walletId, String sequenceId) throws IOException {
-        String url = baseUrl + GET_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$SEQUENCE", sequenceId);
+        String url = baseUrl + GET_WALLET_TXN_SEQ_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$SEQUENCE", sequenceId);
         final String auth;
         if (longLivedToken == null) {
             log.warn("TODO: implement auth with username/password");
