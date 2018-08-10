@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.User:Repo:Tag'
+    compile 'com.github.User:Repo:Tag'
     compileOnly 'org.projectlombok:lombok:1.16.16'
     compile 'org.slf4j:slf4j-api:1.7.25',
             'com.alibaba:fastjson:1.2.31'
