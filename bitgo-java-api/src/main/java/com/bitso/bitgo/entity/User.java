@@ -1,21 +1,22 @@
-package com.bitso.bitgo;
+package com.bitso.bitgo.entity;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Blabla.
  *
  * @author Enrique Zamudio
- *         Date: 5/11/17 4:02 PM
+ * Date: 5/11/17 4:02 PM
  */
 @Data
-public class Wallet {
+public class User {
 
-    private String id;
+    private String user;
+    private List<String> permissions;
+
     private BigDecimal balance;
     private BigDecimal confirmedBalance;
     private BigDecimal spendableBalance;

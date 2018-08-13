@@ -2,7 +2,8 @@ package com.bitso.bitgo.impl;
 
 import com.bitso.bitgo.BitGoClient;
 import com.bitso.bitgo.SendCoinsResponse;
-import com.bitso.bitgo.Wallet;
+import com.bitso.bitgo.entity.Wallet;
+import com.bitso.bitgo.entity.ListWalletResponse;
 import com.bitso.bitgo.entity.WalletTransactionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -15,7 +16,6 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the BitGo client.
@@ -148,14 +148,10 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
-        Map<String,Object> resp = HttpHelper.readResponse(conn);
+
+        final ListWalletResponse resp = objectMapper.readValue(conn.getInputStream(), ListWalletResponse.class);
         log.trace("Wallets response: {}", resp);
-        @SuppressWarnings("unchecked")
-        List<Map<String,Object>> jsw = (List<Map<String,Object>>)resp.get("wallets");
-        if (jsw == null) {
-            return Collections.emptyList();
-        }
-        return jsw.stream().map(BitGoClientImpl::fromMap).collect(Collectors.toList());
+        return resp.getWallets();
     }
 
     @Override
@@ -171,13 +167,10 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
-        Map<String,Object> resp = HttpHelper.readResponse(conn);
+
+        final Wallet resp = objectMapper.readValue(conn.getInputStream(), Wallet.class);
         log.trace("Wallet {} response: {}", wid, resp);
-        if (resp != null && resp.containsKey("id") && resp.containsKey("balance")
-                && resp.containsKey("confirmedBalance")) {
-            return Optional.of(fromMap(resp));
-        }
-        return Optional.empty();
+        return Optional.of(resp);
     }
 
     @Override
@@ -274,29 +267,29 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = unsafe ? HttpHelper.postUnsafe(url, data, auth) : HttpHelper.post(url, data, auth);
         return conn.getResponseCode();
     }
-
-    private static Wallet fromMap(Map<String,Object> map) {
-        Wallet w = new Wallet();
-        w.setId((String)map.get("id"));
-        if (map.containsKey("balance")) {
-            w.setBalance(Conversions.satoshiToBitcoin(((Number)map.get("balance")).longValue()));
-        }
-        if (map.containsKey("confirmedBalance")) {
-            w.setConfirmedBalance(Conversions.satoshiToBitcoin(
-                    ((Number)map.get("confirmedBalance")).longValue()));
-        }
-        if (map.containsKey("spendableBalance")) {
-            w.setSpendableBalance(Conversions.satoshiToBitcoin(
-                    ((Number)map.get("spendableBalance")).longValue()));
-        }
-        if (map.containsKey("spendableConfirmedBalance")) {
-            w.setSpendableConfirmedBalance(Conversions.satoshiToBitcoin(
-                    ((Number)map.get("spendableConfirmedBalance")).longValue()));
-        }
-        if (map.containsKey("instantBalance")) {
-            w.setInstantBalance(Conversions.satoshiToBitcoin(
-                    ((Number)map.get("instantBalance")).longValue()));
-        }
-        return w;
-    }
+//
+//    private static Wallet fromMap(Map<String,Object> map) {
+//        Wallet w = new Wallet();
+//        w.setId((String)map.get("id"));
+//        if (map.containsKey("balance")) {
+//            w.setBalance(Conversions.satoshiToBitcoin(((Number)map.get("balance")).longValue()));
+//        }
+//        if (map.containsKey("confirmedBalance")) {
+//            w.setConfirmedBalance(Conversions.satoshiToBitcoin(
+//                    ((Number)map.get("confirmedBalance")).longValue()));
+//        }
+//        if (map.containsKey("spendableBalance")) {
+//            w.setSpendableBalance(Conversions.satoshiToBitcoin(
+//                    ((Number)map.get("spendableBalance")).longValue()));
+//        }
+//        if (map.containsKey("spendableConfirmedBalance")) {
+//            w.setSpendableConfirmedBalance(Conversions.satoshiToBitcoin(
+//                    ((Number)map.get("spendableConfirmedBalance")).longValue()));
+//        }
+//        if (map.containsKey("instantBalance")) {
+//            w.setInstantBalance(Conversions.satoshiToBitcoin(
+//                    ((Number)map.get("instantBalance")).longValue()));
+//        }
+//        return w;
+//    }
 }

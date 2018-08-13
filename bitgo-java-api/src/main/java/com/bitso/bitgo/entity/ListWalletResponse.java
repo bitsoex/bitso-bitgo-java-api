@@ -9,7 +9,7 @@ import java.util.List;
  * Date: 8/13/18
  */
 @Data
-public class WalletTransactionResponse {
-    private List<Transaction> transactions;
+public class ListWalletResponse {
+    private List<Wallet> wallets;
     private String coin;
 }

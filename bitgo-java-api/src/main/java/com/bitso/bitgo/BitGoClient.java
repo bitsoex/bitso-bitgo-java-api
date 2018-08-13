@@ -1,5 +1,6 @@
 package com.bitso.bitgo;
 
+import com.bitso.bitgo.entity.Wallet;
 import com.bitso.bitgo.entity.WalletTransactionResponse;
 
 import java.io.IOException;

@@ -1,7 +1,8 @@
 package com.bitso.bitgo.impl;
 
-import com.bitso.bitgo.entity.Transaction;
+import com.bitso.bitgo.entity.Wallet;
 import com.bitso.bitgo.entity.WalletTransactionResponse;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,12 +25,12 @@ public class TestClient {
         client.setBaseUrl("https://test.bitgo.com/api/v2");
     }
 
-//    @Test
-//    public void testGetWallets() throws IOException {
-//        List<Wallet> wallets = client.listWallets(COIN);
-//        Assert.assertNotNull(wallets);
-//        Assert.assertFalse(wallets.isEmpty());
-//    }
+    @Test
+    public void testGetWallets() throws IOException {
+        List<Wallet> wallets = client.listWallets(COIN);
+        Assert.assertNotNull(wallets);
+        Assert.assertFalse(wallets.isEmpty());
+    }
 //
 //    @Test
 //    public void testSendMany() throws IOException {
