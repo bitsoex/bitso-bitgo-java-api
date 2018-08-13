@@ -267,29 +267,4 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = unsafe ? HttpHelper.postUnsafe(url, data, auth) : HttpHelper.post(url, data, auth);
         return conn.getResponseCode();
     }
-//
-//    private static Wallet fromMap(Map<String,Object> map) {
-//        Wallet w = new Wallet();
-//        w.setId((String)map.get("id"));
-//        if (map.containsKey("balance")) {
-//            w.setBalance(Conversions.satoshiToBitcoin(((Number)map.get("balance")).longValue()));
-//        }
-//        if (map.containsKey("confirmedBalance")) {
-//            w.setConfirmedBalance(Conversions.satoshiToBitcoin(
-//                    ((Number)map.get("confirmedBalance")).longValue()));
-//        }
-//        if (map.containsKey("spendableBalance")) {
-//            w.setSpendableBalance(Conversions.satoshiToBitcoin(
-//                    ((Number)map.get("spendableBalance")).longValue()));
-//        }
-//        if (map.containsKey("spendableConfirmedBalance")) {
-//            w.setSpendableConfirmedBalance(Conversions.satoshiToBitcoin(
-//                    ((Number)map.get("spendableConfirmedBalance")).longValue()));
-//        }
-//        if (map.containsKey("instantBalance")) {
-//            w.setInstantBalance(Conversions.satoshiToBitcoin(
-//                    ((Number)map.get("instantBalance")).longValue()));
-//        }
-//        return w;
-//    }
 }

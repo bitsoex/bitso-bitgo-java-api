@@ -2,6 +2,8 @@ package com.bitso.bitgo.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * From https://www.bitgo.com/api/v2/#get-wallet-transaction
  *
@@ -21,10 +23,10 @@ public class Transaction {
     private long fee; //	Transaction fee
     private String feeString; //Transaction fee as a string
     private int size; //	Size of the transaction in bytes
-    private String[] inputIds; //	Array of the input ids
-    private Input[] inputs; //	Array of source objects containing id, address, and value
-    private Output[] outputs; //	Array of destination objects containing address and value
-    private Entry[] entries; //	Array of consolidated address to value objects
+    private List<String> inputIds; //	Array of the input ids
+    private List<Input> inputs; //	Array of source objects containing id, address, and value
+    private List<Output> outputs; //	Array of destination objects containing address and value
+    private List<Entry> entries; //	Array of consolidated address to value objects
     private String fromWallet; //	id of the wallet that sent this transaction
 
 }
