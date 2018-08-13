@@ -2,7 +2,9 @@ package com.bitso.bitgo.entity;
 
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * From https://www.bitgo.com/api/v2/#get-wallet-transaction
@@ -24,9 +26,32 @@ public class Transaction {
     private String feeString; //Transaction fee as a string
     private int size; //	Size of the transaction in bytes
     private List<String> inputIds; //	Array of the input ids
-    private List<Input> inputs; //	Array of source objects containing id, address, and value
-    private List<Output> outputs; //	Array of destination objects containing address and value
     private List<Entry> entries; //	Array of consolidated address to value objects
     private String fromWallet; //	id of the wallet that sent this transaction
+
+
+    private List<Input> inputs; //	Array of source objects containing id, address, and value
+    private List<Output> outputs; //	Array of destination objects containing address and value
+
+    private Map<String, Input> inputMap; // key is txid
+    private Map<String, Output> outputMap; // key is txid
+
+    /**
+     * Done post serializaiton to build our maps for quick lookups
+     */
+    public void convertInputAndOutputToMap() {
+        inputMap = new HashMap<>();
+        for (Input input : inputs) {
+            inputMap.put(input.getId(), input);
+        }
+
+        outputMap = new HashMap<>();
+        for (Output output : outputs) {
+            outputMap.put(output.getId(), output);
+        }
+
+        inputs = null;
+        outputs = null;
+    }
 
 }

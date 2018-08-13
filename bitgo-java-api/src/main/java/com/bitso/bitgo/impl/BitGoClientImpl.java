@@ -2,6 +2,7 @@ package com.bitso.bitgo.impl;
 
 import com.bitso.bitgo.BitGoClient;
 import com.bitso.bitgo.SendCoinsResponse;
+import com.bitso.bitgo.entity.Transaction;
 import com.bitso.bitgo.entity.Wallet;
 import com.bitso.bitgo.entity.ListWalletResponse;
 import com.bitso.bitgo.entity.WalletTransactionResponse;
@@ -243,6 +244,9 @@ public class BitGoClientImpl implements BitGoClient {
         conn.setRequestProperty("Authorization", "Bearer " + auth);
 
         final WalletTransactionResponse resp = objectMapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
+        for (final Transaction txn : resp.getTransactions()) {
+            txn.convertInputAndOutputToMap();
+        }
         log.trace("getCurrentUserProfile response: {}", resp);
         return resp;
     }
