@@ -1,5 +1,7 @@
 package com.bitso.bitgo;
 
+import com.bitso.bitgo.entity.Transaction;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -68,6 +70,15 @@ public interface BitGoClient {
      * @throws IOException
      */
     Optional<Map<String, Object>> getWalletTransferSeqId(String coin, String walletId, String sequenceId) throws IOException;
+
+    /**
+     * See https://www.bitgo.com/api/v2/#list-wallet-transactions
+     * @param coin
+     * @param walletId
+     * @return
+     * @throws IOException
+     */
+    List<Transaction> listWalletTransactions(String coin, String walletId) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#unlock

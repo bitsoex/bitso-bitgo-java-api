@@ -3,6 +3,8 @@ package com.bitso.bitgo.impl;
 import com.bitso.bitgo.BitGoClient;
 import com.bitso.bitgo.SendCoinsResponse;
 import com.bitso.bitgo.Wallet;
+import com.bitso.bitgo.entity.Transaction;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -35,11 +37,14 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String CURRENT_USER_PROFILE_URL = "/user/me";
     private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer/$TRANSFER";
     private static final String GET_WALLET_TXN_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
+    private static final String LIST_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/tx";
     private static final String UNLOCK_URL = "/user/unlock";
 
     private String longLivedToken;
     @Setter @Getter
     private boolean unsafe;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public BitGoClientImpl(String longLivedToken) {
         this.longLivedToken = longLivedToken;
@@ -228,6 +233,25 @@ public class BitGoClientImpl implements BitGoClient {
         Map<String,Object> resp = HttpHelper.readResponse(conn);
         log.trace("getCurrentUserProfile response: {}", resp);
         return Optional.of(resp);
+    }
+
+    @Override
+    public List<Transaction> listWalletTransactions(String coin, String walletId) throws IOException {
+        String url = baseUrl + LIST_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+        final String auth;
+        if (longLivedToken == null) {
+            log.warn("TODO: implement auth with username/password");
+            auth = "TODO!";
+        } else {
+            auth = longLivedToken;
+        }
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+
+        final List<Transaction> resp = objectMapper.readValue(conn.getInputStream(), List.class);
+        log.trace("getCurrentUserProfile response: {}", resp);
+        return resp;
     }
 
     @Override
