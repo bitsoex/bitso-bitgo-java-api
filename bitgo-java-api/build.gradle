@@ -3,7 +3,6 @@ apply plugin:'idea'
 //apply plugin:'maven-publish'  // So we can run 'gradle publishToMavenLocal' see https://docs.gradle.org/current/userguide/publishing_maven.html
 
 group = 'com.bitso'
-//version='0.0.4'
 version='SNAPSHOT'
 
 repositories {
@@ -13,10 +12,10 @@ repositories {
 
 dependencies {
 //    implementation 'com.github.User:Repo:Tag'
-    compileOnly 'org.projectlombok:lombok:1.16.16'
-    compile 'org.slf4j:slf4j-api:1.7.25',
+    compileOnly 'org.projectlombok:lombok:1.+'
+    compile 'org.slf4j:slf4j-api:1.7.+',
             'com.alibaba:fastjson:1.2.31',
-            'com.fasterxml.jackson.core:jackson-databind:2.9.5'
+            'com.fasterxml.jackson.core:jackson-databind:2.+'
     testCompile 'junit:junit:4.12'
 }
 

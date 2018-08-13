@@ -1,15 +1,18 @@
 package com.bitso.bitgo.entity;
 
+import lombok.Data;
+
 /**
  * From https://www.bitgo.com/api/v2/#get-wallet-transaction
  *
- * @author kushalkhan
+ * @author kushal256
  * Date: 8/13/18
  */
+@Data
 public class Transaction {
     private String id; //	Transaction hash
     private String normalizedTxHash; //	Normalized transaction hash
-    private long date; //	Date of the transaction
+    private String date; //	Date of the transaction
     private String hex; //	Transaction Hex
     private String blockHash; //	Block hash the transaction is apart of
     private long blockHeight; //	Height of the block

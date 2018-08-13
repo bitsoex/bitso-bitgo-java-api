@@ -3,7 +3,7 @@ package com.bitso.bitgo.impl;
 import com.bitso.bitgo.BitGoClient;
 import com.bitso.bitgo.SendCoinsResponse;
 import com.bitso.bitgo.Wallet;
-import com.bitso.bitgo.entity.Transaction;
+import com.bitso.bitgo.entity.WalletTransactionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -236,7 +236,7 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public List<Transaction> listWalletTransactions(String coin, String walletId) throws IOException {
+    public WalletTransactionResponse listWalletTransactions(String coin, String walletId) throws IOException {
         String url = baseUrl + LIST_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId);
         final String auth;
         if (longLivedToken == null) {
@@ -249,7 +249,7 @@ public class BitGoClientImpl implements BitGoClient {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
 
-        final List<Transaction> resp = objectMapper.readValue(conn.getInputStream(), List.class);
+        final WalletTransactionResponse resp = objectMapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
         log.trace("getCurrentUserProfile response: {}", resp);
         return resp;
     }
