@@ -2,6 +2,7 @@ package com.bitso.bitgo.entity;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,8 @@ public class Transaction {
     private List<Input> inputs; //	Array of source objects containing id, address, and value
     private List<Output> outputs; //	Array of destination objects containing address and value
 
-    private Map<String, Input> inputMap; // key is txid
-    private Map<String, Output> outputMap; // key is txid
+    private Map<String, List<Input>> inputMap; // key is txid
+    private Map<String, List<Output>> outputMap; // key is txid
 
     /**
      * Done post serializaiton to build our maps for quick lookups
@@ -42,12 +43,22 @@ public class Transaction {
     public void convertInputAndOutputToMap() {
         inputMap = new HashMap<>();
         for (Input input : inputs) {
-            inputMap.put(input.getId(), input);
+            List<Input> list = inputMap.get(input.getAddress());
+            if (list == null){
+                list = new ArrayList<>();
+                inputMap.put(input.getAddress(), list);
+            }
+            list.add(input);
         }
 
         outputMap = new HashMap<>();
         for (Output output : outputs) {
-            outputMap.put(output.getId(), output);
+            List<Output> list = outputMap.get(output.getAddress());
+            if (list == null){
+                list = new ArrayList<>();
+                outputMap.put(output.getAddress(), list);
+            }
+            list.add(output);
         }
 
         inputs = null;
