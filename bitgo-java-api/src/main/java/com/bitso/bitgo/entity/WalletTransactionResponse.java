@@ -12,4 +12,5 @@ import java.util.List;
 public class WalletTransactionResponse {
     private List<Transaction> transactions;
     private String coin;
+    private String nextBatchPrevId;  //Need to test
 }

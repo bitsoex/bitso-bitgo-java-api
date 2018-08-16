@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static junit.framework.TestCase.assertTrue;
+
 /**
  * Simple client tests.
  *
@@ -28,14 +30,14 @@ public class TestClient {
     }
 
     @Test
-    public void testGetWallets() throws IOException {
+    public void getWallets() throws IOException {
         List<Wallet> wallets = client.listWallets(COIN);
         Assert.assertNotNull(wallets);
         Assert.assertFalse(wallets.isEmpty());
     }
 
     @Test
-    public void testCurrentUserProfile() throws IOException {
+    public void currentUserProfile() throws IOException {
         final Optional<Map<String, Object>> profile = client.getCurrentUserProfile();
         Assert.assertNotNull(profile.get());
     }
@@ -52,8 +54,9 @@ public class TestClient {
 //    }
 
     @Test
-    public void test() throws IOException {
-        final WalletTransactionResponse list = client.listWalletTransactions("tbtc", "5b6c7d15909e2d8a032abdf08b4929d8");
+    public void listWalletTransactions() throws IOException {
+        final WalletTransactionResponse list = client.listWalletTransactions("tbtc", "5b6c7d15909e2d8a032abdf08b4929d8", null);
+        assertTrue(list.getTransactions().size() > 10);
         System.out.println(list);
     }
 }

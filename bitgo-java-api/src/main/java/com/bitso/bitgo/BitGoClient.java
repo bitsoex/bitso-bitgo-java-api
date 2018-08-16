@@ -77,10 +77,11 @@ public interface BitGoClient {
      * See https://www.bitgo.com/api/v2/#list-wallet-transactions
      * @param coin
      * @param walletId
+     * @param nextBatchPrevId Optional
      * @return
      * @throws IOException
      */
-    WalletTransactionResponse listWalletTransactions(String coin, String walletId) throws IOException;
+    WalletTransactionResponse listWalletTransactions(String coin, String walletId, String nextBatchPrevId) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#unlock
