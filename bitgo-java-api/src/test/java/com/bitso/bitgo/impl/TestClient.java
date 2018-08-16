@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Simple client tests.
@@ -32,11 +34,11 @@ public class TestClient {
         Assert.assertFalse(wallets.isEmpty());
     }
 
-//    @Test
-//    public void testCurrentUserProfile() throws IOException {
-//        final Optional<UserProfile> profile = client.getCurrentUserProfile();
-//        Assert.assertNotNull(profile.get());
-//    }
+    @Test
+    public void testCurrentUserProfile() throws IOException {
+        final Optional<Map<String, Object>> profile = client.getCurrentUserProfile();
+        Assert.assertNotNull(profile.get());
+    }
 //
 //    @Test
 //    public void testSendMany() throws IOException {

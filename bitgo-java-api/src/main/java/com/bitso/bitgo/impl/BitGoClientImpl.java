@@ -6,6 +6,7 @@ import com.bitso.bitgo.entity.Transaction;
 import com.bitso.bitgo.entity.Wallet;
 import com.bitso.bitgo.entity.ListWalletResponse;
 import com.bitso.bitgo.entity.WalletTransactionResponse;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -114,7 +115,7 @@ public class BitGoClientImpl implements BitGoClient {
             log.error("Got error: {}", errorResponse.getError());
             return Optional.of(errorResponse);
         }
-        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        Map<String,Object> resp = objectMapper.readValue(conn.getInputStream(), new TypeReference< Map<String,Object>>(){});
         log.trace("sendMany response: {}", resp);
         if (resp.containsKey("error") || resp.containsKey("tx")) {
             SendCoinsResponse r = new SendCoinsResponse();
@@ -187,7 +188,7 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
-        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        Map<String,Object> resp = objectMapper.readValue(conn.getInputStream(), new TypeReference< Map<String,Object>>(){});
         log.trace("getCurrentUserProfile response: {}", resp);
         return Optional.of(resp);
     }
@@ -205,7 +206,7 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
-        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        Map<String,Object> resp = objectMapper.readValue(conn.getInputStream(), new TypeReference< Map<String,Object>>(){});
         log.trace("getCurrentUserProfile response: {}", resp);
         return Optional.of(resp);
     }
@@ -224,7 +225,7 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
-        Map<String,Object> resp = HttpHelper.readResponse(conn);
+        Map<String,Object> resp = objectMapper.readValue(conn.getInputStream(), new TypeReference< Map<String,Object>>(){});
         log.trace("getCurrentUserProfile response: {}", resp);
         return Optional.of(resp);
     }
