@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Data
 public class SendCoinsResponse extends AbstractResponse {
 
-    private String tx;
-    private String txid;
+    private String tx;    //hex-encoded tx
+    private String txid;  //hash of tx
     private String status;
 }

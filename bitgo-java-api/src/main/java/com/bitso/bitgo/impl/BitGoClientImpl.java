@@ -139,7 +139,7 @@ public class BitGoClientImpl implements BitGoClient {
             log.error("Got error: {}", errorResponse.getError());
             return Optional.of(errorResponse);
         }
-        SendCoinsResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), SendCoinsResponse.class);  //TODO this needs to be tested
+        SendCoinsResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), SendCoinsResponse.class);
         log.trace("sendMany response: {}", resp);
         return Optional.of(resp);
     }

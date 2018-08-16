@@ -1,6 +1,5 @@
 package com.bitso.bitgo;
 
-import com.bitso.bitgo.entity.UserProfile;
 import com.bitso.bitgo.entity.Wallet;
 import com.bitso.bitgo.entity.WalletTransactionResponse;
 

@@ -7,14 +7,14 @@ import lombok.Data;
  {
  "user": {
  "id": "5b6c7c569a75b87f05d2ccfb51eec873",
- "username": "kushal.khan@gmail.com",
+ "username": "asdf@gmail.com",
  "name": {
  "full": "Kushal Khan",
  "first": "Kushal",
  "last": "Khan"
  },
  "email": {
- "email": "kushal.khan@gmail.com",
+ "email": "asdf@gmail.com",
  "verified": true
  },
  "phone": {
