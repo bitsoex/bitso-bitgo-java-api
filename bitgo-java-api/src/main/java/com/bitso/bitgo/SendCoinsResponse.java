@@ -13,11 +13,6 @@ import java.math.BigDecimal;
 @Data
 public class SendCoinsResponse extends AbstractResponse {
 
-    private String tx;
-    private String hash;
-    private BigDecimal fee;
-    private BigDecimal feeRate;
-    private String pendingApproval;
-    private boolean otp;
-    private String triggeredPolicy;
+    private String txid;
+    private String status;
 }
