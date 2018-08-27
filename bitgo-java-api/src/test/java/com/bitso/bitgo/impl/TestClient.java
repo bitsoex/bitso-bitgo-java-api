@@ -26,9 +26,10 @@ import static junit.framework.TestCase.assertTrue;
 @Slf4j
 public class TestClient {
 
-    public static final String WALLET_ID = "5b6c7d15909e2d8a032abdf08b4929d8";
+    public static final String WALLET_ID = "yourvalue";
+    public static final String TOKEN = "yourvalue";
     private static final String COIN = "tbtc";
-    private final BitGoClientImpl client = new BitGoClientImpl("v2xcce93608187287e7ff8a246403c39a9babbb1c737b927ed275c172f558e0b3ab");
+    private final BitGoClientImpl client = new BitGoClientImpl(TOKEN);
 
     //
 //    @Test
