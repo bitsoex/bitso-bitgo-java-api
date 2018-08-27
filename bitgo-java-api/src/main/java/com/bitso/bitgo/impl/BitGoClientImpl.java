@@ -43,6 +43,7 @@ public class BitGoClientImpl implements BitGoClient {
     @Getter
     @Setter
     private String baseUrl = "http://localhost:3080/api/v2";
+    @Setter
     private String longLivedToken;
     @Setter
     @Getter
@@ -53,10 +54,6 @@ public class BitGoClientImpl implements BitGoClient {
         this.longLivedToken = longLivedToken;
     }
 
-
-    public void setLongLivedToken(String token) {
-        longLivedToken = token;
-    }
 
     @Override
     public Optional<String> login(String email, String password, String otp, boolean extensible)

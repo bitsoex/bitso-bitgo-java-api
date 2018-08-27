@@ -10,6 +10,7 @@ import java.util.List;
 public class Wallet {
 
     private String id;
+    private String walletId;
     private List<User> users;
     private String coin;
     private String label;
