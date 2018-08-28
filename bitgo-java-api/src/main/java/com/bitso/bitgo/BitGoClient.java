@@ -80,7 +80,7 @@ public interface BitGoClient {
      * @return
      * @throws IOException
      */
-    WalletTransactionResponse listWalletTransactions(String coin, String walletId, String nextBatchPrevId) throws IOException;
+    WalletTransactionResponse listWalletTransfers(String coin, String walletId, String nextBatchPrevId) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#unlock

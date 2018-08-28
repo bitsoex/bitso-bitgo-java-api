@@ -8,6 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SerializationUtil {
 
+    public static final ObjectMapper mapper;
 
-    public static final ObjectMapper mapper = new ObjectMapper();
+    static {
+        mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+//        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 }

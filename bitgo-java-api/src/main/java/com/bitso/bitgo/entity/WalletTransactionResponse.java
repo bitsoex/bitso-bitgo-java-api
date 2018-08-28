@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Data
 public class WalletTransactionResponse {
-    private List<Transaction> transactions;
+    private List<Transfer> transfers;
     private String coin;
     private String nextBatchPrevId;  //Need to test
 }

@@ -32,9 +32,9 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String LIST_WALLETS_URL = "/$COIN/wallet";
     private static final String GET_WALLET_URL = "/$COIN/wallet/";
     private static final String CURRENT_USER_PROFILE_URL = "/user/me";
-    private static final String GET_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/transfer/$TRANSFER";
-    private static final String GET_WALLET_TXN_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
-    private static final String LIST_WALLET_TXN_URL = "/$COIN/wallet/$WALLET/tx";
+    private static final String GET_WALLET_TRANSFER_URL = "/$COIN/wallet/$WALLET/transfer/$TRANSFER";
+    private static final String GET_WALLET_TRANSFER_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
+    private static final String LIST_WALLET_TRANSFER_URL = "/$COIN/wallet/$WALLET/transfer";
     private static final String UNLOCK_URL = "/user/unlock";
     private final Logger log = LoggerFactory.getLogger(getClass());
     /**
@@ -154,7 +154,7 @@ public class BitGoClientImpl implements BitGoClient {
 
     @Override
     public Optional<Map<String, Object>> getWalletTransferId(String coin, String walletId, String walletTransferId) throws IOException {
-        String url = baseUrl + GET_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$TRANSFER", walletTransferId);
+        String url = baseUrl + GET_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$TRANSFER", walletTransferId);
         HttpURLConnection conn = httpGet(url);
         Map<String, Object> resp = SerializationUtil.mapper.readValue(conn.getInputStream(), new TypeReference<Map<String, Object>>() {
         });
@@ -164,7 +164,7 @@ public class BitGoClientImpl implements BitGoClient {
 
     @Override
     public Optional<Map<String, Object>> getWalletTransferSeqId(String coin, String walletId, String sequenceId) throws IOException {
-        String url = baseUrl + GET_WALLET_TXN_SEQ_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$SEQUENCE", sequenceId);
+        String url = baseUrl + GET_WALLET_TRANSFER_SEQ_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$SEQUENCE", sequenceId);
 
         HttpURLConnection conn = httpGet(url);
         Map<String, Object> resp = SerializationUtil.mapper.readValue(conn.getInputStream(), new TypeReference<Map<String, Object>>() {
@@ -174,8 +174,8 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public WalletTransactionResponse listWalletTransactions(String coin, String walletId, String prevId) throws IOException {
-        String url = baseUrl + LIST_WALLET_TXN_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+    public WalletTransactionResponse listWalletTransfers(String coin, String walletId, String prevId) throws IOException {
+        String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId);
 
         HttpURLConnection conn = httpGet(url);
         if (prevId != null) {

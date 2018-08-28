@@ -1,5 +1,6 @@
 package com.bitso.bitgo.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -19,4 +20,9 @@ public class Entry {
 
     private String wallet;
     private String coinName;
+
+    @JsonProperty("isChange")  //Jackson tries 'ischange'
+    private boolean isChange;
+    @JsonProperty("isPayGo")  //Jackson tries 'payGo'
+    private boolean isPayGo;
 }

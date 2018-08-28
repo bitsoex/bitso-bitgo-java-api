@@ -12,6 +12,7 @@ repositories {
 dependencies {
     compile 'org.projectlombok:lombok:1.+'
     compile 'org.slf4j:slf4j-api:1.7.+',
-            'com.fasterxml.jackson.core:jackson-databind:2.+'
-    testCompile 'junit:junit:4.12'
+            'com.fasterxml.jackson.core:jackson-databind:2.+',
+            'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.+' //from https://stackoverflow.com/questions/44056473/jackson-json-objectmapper-fails-to-map-nested-zoneddatetime-instance-when-conver#44057571
+            testCompile 'junit:junit:4.12'
 }
