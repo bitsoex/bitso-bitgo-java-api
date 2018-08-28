@@ -11,7 +11,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +49,8 @@ public class TestClient {
 
     @Before
     public void setup() {
-        client.setBaseUrl("https://test.bitgo.com/api/v2");
+        client.setBaseUrl("https://localhost:3080/api/v2"); //"https://test.bitgo.com/api/v2");
+        client.setUnsafe(true);
     }
 
     @Test

@@ -23,6 +23,28 @@ import java.util.Map;
 @Slf4j
 public class HttpHelper {
 
+
+    public static HttpURLConnection get(String url,
+                                        String auth) throws IOException {
+        URL u = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        return conn;
+    }
+
+
+    public static HttpURLConnection getUnsafe(String url,
+                                              String auth) throws IOException {
+        URL u = new URL(url);
+        HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        unsafeConnection(conn);
+        return conn;
+    }
+
+
     public static HttpURLConnection post(String url, Map<String, Object> data,
                                          String auth) throws IOException {
         URL u = new URL(url);
@@ -36,9 +58,15 @@ public class HttpHelper {
     public static HttpURLConnection postUnsafe(String url, Map<String, Object> data,
                                                String auth) throws IOException {
         URL u = new URL(url);
-        HttpURLConnection cc = (HttpURLConnection) u.openConnection();
-        cc.setRequestProperty("Content-Type", "application/json");
-        cc.setRequestProperty("Authorization", "Bearer " + auth);
+        HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + auth);
+        unsafeConnection(conn);
+        post(conn, auth, data);
+        return conn;
+    }
+
+    private static boolean unsafeConnection(HttpURLConnection cc) {
         if (cc instanceof HttpsURLConnection) {
             HttpsURLConnection conn = (HttpsURLConnection) cc;
             try {
@@ -47,11 +75,10 @@ public class HttpHelper {
                 conn.setSSLSocketFactory(sc.getSocketFactory());
                 conn.setHostnameVerifier((s, ssl) -> true);
             } catch (GeneralSecurityException ex) {
-                return null;
+                return true;
             }
         }
-        post(cc, auth, data);
-        return cc;
+        return false;
     }
 
     private static void post(HttpURLConnection conn, String auth, Map<String, Object> data)

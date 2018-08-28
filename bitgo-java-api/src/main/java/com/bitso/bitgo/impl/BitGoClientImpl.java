@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -205,10 +204,7 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     private HttpURLConnection httpGet(String url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setRequestProperty("Authorization", "Bearer " + getAuth());
-        return conn;
+        return unsafe ? HttpHelper.getUnsafe(url, getAuth()) : HttpHelper.get(url, getAuth());
     }
 
     private String getAuth() {
