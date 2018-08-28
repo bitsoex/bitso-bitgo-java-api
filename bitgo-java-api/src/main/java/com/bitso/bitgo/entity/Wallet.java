@@ -40,6 +40,6 @@ public class Wallet {
     private Admin admin;
 
     private String startDate;
-
+    private String enterprise;
 
 }
