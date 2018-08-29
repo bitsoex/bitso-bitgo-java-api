@@ -25,15 +25,15 @@ public class HttpHelper {
 
 
     public static HttpURLConnection get(String url,
-                                        String auth) throws IOException {
-        HttpURLConnection conn = createConn(url, auth);
+                                        String auth, Map<String, String> reqPropMap) throws IOException {
+        HttpURLConnection conn = createConn(url, auth, reqPropMap);
         return conn;
     }
 
 
     public static HttpURLConnection getUnsafe(String url,
-                                              String auth) throws IOException {
-        HttpURLConnection conn = createConn(url, auth);
+                                              String auth, Map<String, String> reqPropMap) throws IOException {
+        HttpURLConnection conn = createConn(url, auth, reqPropMap);
         unsafeConnection(conn);
         return conn;
     }
@@ -41,24 +41,29 @@ public class HttpHelper {
 
     public static HttpURLConnection post(String url, Map<String, Object> data,
                                          String auth) throws IOException {
-        HttpURLConnection conn = createConn(url, auth);
+        HttpURLConnection conn = createConn(url, auth, null);
         post(conn, auth, data);
         return conn;
     }
 
     public static HttpURLConnection postUnsafe(String url, Map<String, Object> data,
                                                String auth) throws IOException {
-        HttpURLConnection conn = createConn(url, auth);
+        HttpURLConnection conn = createConn(url, auth, null);
         unsafeConnection(conn);
         post(conn, auth, data);
         return conn;
     }
 
-    private static HttpURLConnection createConn(String url, String auth) throws IOException {
+    private static HttpURLConnection createConn(String url, String auth, Map<String, String> reqPropMap) throws IOException {
         URL u = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) u.openConnection();
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer " + auth);
+        if (reqPropMap != null){
+            for (Map.Entry<String, String> entry : reqPropMap.entrySet()){
+                conn.setRequestProperty(entry.getKey(), entry.getValue());
+            }
+        }
         return conn;
     }
 

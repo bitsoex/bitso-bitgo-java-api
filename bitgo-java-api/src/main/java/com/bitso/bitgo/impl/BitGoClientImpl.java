@@ -90,13 +90,7 @@ public class BitGoClientImpl implements BitGoClient {
                                                 int minConfirms, boolean enforceMinConfirmsForChange)
             throws IOException {
         String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
-        final String auth;
-        if (longLivedToken == null) {
-            log.warn("TODO: implement auth with username/password");
-            auth = "TODO!";
-        } else {
-            auth = longLivedToken;
-        }
+
         final List<Map<String, Object>> addr = new ArrayList<>(recipients.size());
         for (Map.Entry<String, BigDecimal> e : recipients.entrySet()) {
             Map<String, Object> a = new HashMap<>(2);
@@ -124,7 +118,7 @@ public class BitGoClientImpl implements BitGoClient {
         data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
         log.info("sendMany {}", data);
         data.put("walletPassphrase", walletPass);
-        HttpURLConnection conn = httpPost(url, data, auth);
+        HttpURLConnection conn = httpPost(url, data);
         if (conn == null) {
             return Optional.empty();
         }
@@ -176,10 +170,13 @@ public class BitGoClientImpl implements BitGoClient {
     public WalletTransactionResponse listWalletTransfers(String coin, String walletId, String prevId) throws IOException {
         String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId);
 
-        HttpURLConnection conn = httpGet(url);
-        if (prevId != null) {
-            conn.setRequestProperty("prevId", prevId);  //TODO this needs to be tested
+        Map<String, String> reqPropMap = null;
+        if (prevId != null){
+            reqPropMap = new HashMap<>();
+            reqPropMap.put("prevId", prevId);
         }
+        HttpURLConnection conn = httpGet(url, reqPropMap);
+
         final WalletTransactionResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
         log.trace("listWalletTransactions response: {}", resp);
         return resp;
@@ -195,16 +192,19 @@ public class BitGoClientImpl implements BitGoClient {
             data.put("duration", duration);
         }
 
-        HttpURLConnection conn = httpPost(url, data, getAuth());
+        HttpURLConnection conn = httpPost(url, data);
         return conn.getResponseCode();
     }
 
-    private HttpURLConnection httpPost(String url, Map<String, Object> data, String auth) throws IOException {
-        return unsafe ? HttpHelper.postUnsafe(url, data, auth) : HttpHelper.post(url, data, auth);
+    private HttpURLConnection httpPost(String url, Map<String, Object> data) throws IOException {
+        return unsafe ? HttpHelper.postUnsafe(url, data, getAuth()) : HttpHelper.post(url, data, getAuth());
+    }
+    private HttpURLConnection httpGet(String url) throws IOException {
+        return httpGet(url, null);
     }
 
-    private HttpURLConnection httpGet(String url) throws IOException {
-        return unsafe ? HttpHelper.getUnsafe(url, getAuth()) : HttpHelper.get(url, getAuth());
+    private HttpURLConnection httpGet(String url, Map<String, String> reqPropMap) throws IOException {
+        return unsafe ? HttpHelper.getUnsafe(url, getAuth(), reqPropMap) : HttpHelper.get(url, getAuth(), reqPropMap);
     }
 
     private String getAuth() {
