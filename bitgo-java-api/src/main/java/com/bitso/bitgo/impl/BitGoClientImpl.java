@@ -203,8 +203,8 @@ public class BitGoClientImpl implements BitGoClient {
         return httpGet(url, null);
     }
 
-    private HttpURLConnection httpGet(String url, Map<String, String> reqPropMap) throws IOException {
-        return unsafe ? HttpHelper.getUnsafe(url, getAuth(), reqPropMap) : HttpHelper.get(url, getAuth(), reqPropMap);
+    private HttpURLConnection httpGet(String url, Map<String, String> reqParams) throws IOException {
+        return unsafe ? HttpHelper.getUnsafe(url, getAuth(), reqParams) : HttpHelper.get(url, getAuth(), reqParams);
     }
 
     private String getAuth() {
