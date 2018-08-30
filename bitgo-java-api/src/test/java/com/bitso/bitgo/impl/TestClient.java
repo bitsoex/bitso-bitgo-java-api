@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -72,13 +73,14 @@ public class TestClient {
         final WalletTransactionResponse list = client.listWalletTransfers(COIN, WALLET_ID, null);
         System.out.println("list.size() = " + list.getTransfers().size());
         System.out.println("list = " + list);
-        long priorTimestamp = Long.MAX_VALUE;
+//        long priorTimestamp = Long.MAX_VALUE;
         for (Transfer txn : list.getTransfers()) {
-            long currentTimestamp = parseTimeInstant(txn.getDate());
+
+//            long currentTimestamp = parseTimeInstant(txn.getDate());
 //            log.info("priorTimestamp = {} and current = {}", priorTimestamp, currentTimestamp);
 //            assertTrue(currentTimestamp < priorTimestamp);
-            System.out.println("current = " + currentTimestamp);
-            priorTimestamp = currentTimestamp;
+            System.out.println("current = " + txn.getDate());
+//            priorTimestamp = currentTimestamp;
         }
         assertTrue(list.getTransfers().size() > 10);
         System.out.println(list);

@@ -2,7 +2,7 @@ package com.bitso.bitgo.entity;
 
 import lombok.Data;
 
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * @author kushal256
@@ -10,6 +10,6 @@ import java.time.ZonedDateTime;
  */
 @Data
 public class History {
-    private ZonedDateTime date;
+    private Date date;
     private String action;
 }

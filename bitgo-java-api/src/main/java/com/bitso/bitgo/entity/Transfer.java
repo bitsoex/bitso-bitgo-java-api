@@ -1,11 +1,9 @@
 package com.bitso.bitgo.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +20,9 @@ public class Transfer {
     private String wallet;  //id of the wallet that sent this transaction
     private String txid; // Transfer hash
     private long height; //	Height of the block
-    private ZonedDateTime date; //	Date of the transaction
+
+    private Date date; //	Date of the transaction
+
     private String hex; //	Transfer Hex
     private BigDecimal usd;  //value of the total amount sent in USD
     private BigDecimal usdRate;  //price of the cryptocurrency being sent in USD/base_unit
@@ -34,14 +34,14 @@ public class Transfer {
     @JsonProperty("nSegwitInputs")  //Jackson tries 'nsegwitInputs'
     private long nSegwitInputs; //number of inputs spending from segwit addresses (exists only if coin supports segwit)
 
-//    private List<Entry> entries; //	Array of consolidated address to value objects
+    //    private List<Entry> entries; //	Array of consolidated address to value objects
     private List<Input> inputs;  //Array of inputs used in the associated transaction (only returned from UTXO coins)
     private List<Output> outputs;  //Array of outputs used in the associated transaction (only returned from UTXO coins)
 
-    private ZonedDateTime confirmedTime;
-    private ZonedDateTime createdTime;
-    private ZonedDateTime unconfirmedTime;
-    private ZonedDateTime signedTime;
+    private Date confirmedTime;
+    private Date createdTime;
+    private Date unconfirmedTime;
+    private Date signedTime;
 
     private String type; //"send" or "receive"
     private long value;
