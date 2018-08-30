@@ -12,6 +12,6 @@ repositories {
 dependencies {
     compile 'org.projectlombok:lombok:1.+'
     compile 'org.slf4j:slf4j-api:1.7.+',
-            'com.fasterxml.jackson.core:jackson-databind:2.+',
-            testCompile 'junit:junit:4.12'
+            'com.fasterxml.jackson.core:jackson-databind:2.+'
+    testCompile 'junit:junit:4.12'
 }
