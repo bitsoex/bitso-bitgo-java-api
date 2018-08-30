@@ -34,7 +34,7 @@ public class Transfer {
     @JsonProperty("nSegwitInputs")  //Jackson tries 'nsegwitInputs'
     private long nSegwitInputs; //number of inputs spending from segwit addresses (exists only if coin supports segwit)
 
-    private List<Entry> entries; //	Array of consolidated address to value objects
+//    private List<Entry> entries; //	Array of consolidated address to value objects
     private List<Input> inputs;  //Array of inputs used in the associated transaction (only returned from UTXO coins)
     private List<Output> outputs;  //Array of outputs used in the associated transaction (only returned from UTXO coins)
 
