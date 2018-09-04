@@ -168,7 +168,7 @@ public class BitGoClientImpl implements BitGoClient {
 
     @Override
     public WalletTransactionResponse listWalletTransfers(String coin, String walletId, String prevId) throws IOException {
-        String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+        String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId) + "?limit=100";  //TODO reexamine later
 
         Map<String, String> reqPropMap = null;
         if (prevId != null){
