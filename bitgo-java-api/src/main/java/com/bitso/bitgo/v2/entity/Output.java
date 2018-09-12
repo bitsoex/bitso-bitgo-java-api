@@ -16,7 +16,7 @@ public class Output {
     private String id;
     private String address;
     private BigDecimal value;
-//    private String valueString;  // not needed for now
+    //    private String valueString;  // not needed for now
     private String wallet;
     private int chain;
     private int index;

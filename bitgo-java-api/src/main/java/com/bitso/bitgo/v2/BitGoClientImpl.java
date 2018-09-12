@@ -1,11 +1,11 @@
 package com.bitso.bitgo.v2;
 
-import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import com.bitso.bitgo.util.HttpHelper;
 import com.bitso.bitgo.util.SerializationUtil;
-import com.bitso.bitgo.v2.entity.SendCoinsResponse;
 import com.bitso.bitgo.v2.entity.ListWalletResponse;
+import com.bitso.bitgo.v2.entity.SendCoinsResponse;
 import com.bitso.bitgo.v2.entity.Wallet;
+import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 import lombok.Setter;

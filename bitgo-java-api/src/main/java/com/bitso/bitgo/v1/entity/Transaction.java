@@ -15,7 +15,7 @@ public class Transaction {
     private String blockhash;
     private long confirmations;
     private Date date;//   "date": "2015-01-16T01:12:52.000Z",
-    //  private    List<Entry> entries;
+    private List<Entry> entries;
     private long fee, height;
     private String id;
     private List<Input> inputs;

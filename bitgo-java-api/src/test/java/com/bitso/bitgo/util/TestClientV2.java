@@ -1,11 +1,10 @@
 package com.bitso.bitgo.util;
 
 import com.bitso.bitgo.v2.BitGoClient;
+import com.bitso.bitgo.v2.BitGoClientImpl;
 import com.bitso.bitgo.v2.entity.SendCoinsResponse;
-import com.bitso.bitgo.v2.entity.Transfer;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
-import com.bitso.bitgo.v2.BitGoClientImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Ignore;
