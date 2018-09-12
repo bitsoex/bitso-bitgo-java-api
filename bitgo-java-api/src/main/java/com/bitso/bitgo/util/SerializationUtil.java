@@ -1,4 +1,4 @@
-package com.bitso.bitgo.impl;
+package com.bitso.bitgo.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,15 +1,15 @@
-package com.bitso.bitgo.impl;
+package com.bitso.bitgo.v2;
 
-import com.bitso.bitgo.BitGoClient;
-import com.bitso.bitgo.SendCoinsResponse;
-import com.bitso.bitgo.entity.ListWalletResponse;
-import com.bitso.bitgo.entity.Wallet;
-import com.bitso.bitgo.entity.WalletTransactionResponse;
+import com.bitso.bitgo.v2.entity.WalletTransferResponse;
+import com.bitso.bitgo.util.HttpHelper;
+import com.bitso.bitgo.util.SerializationUtil;
+import com.bitso.bitgo.v2.entity.SendCoinsResponse;
+import com.bitso.bitgo.v2.entity.ListWalletResponse;
+import com.bitso.bitgo.v2.entity.Wallet;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,6 +22,7 @@ import java.util.*;
  * @author Enrique Zamudio
  * Date: 5/8/17 4:46 PM
  */
+@Slf4j
 public class BitGoClientImpl implements BitGoClient {
 
     /**
@@ -35,7 +36,8 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String GET_WALLET_TRANSFER_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
     private static final String LIST_WALLET_TRANSFER_URL = "/$COIN/wallet/$WALLET/transfer";
     private static final String UNLOCK_URL = "/user/unlock";
-    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private static final String V1_LIST_WALLET_TXN_URL = "/wallet/$WALLET/tx";
     /**
      * The base URL (host, port, up to api/v1 for example
      */
@@ -43,14 +45,16 @@ public class BitGoClientImpl implements BitGoClient {
     @Setter
     private String baseUrl = "http://localhost:3080/api/v2";
     @Setter
-    private String longLivedToken;
+    private String token;
     @Setter
     @Getter
     private boolean unsafe;
 
 
-    public BitGoClientImpl(String longLivedToken) {
-        this.longLivedToken = longLivedToken;
+    public BitGoClientImpl(String token, String baseUrl, boolean unsafe) {
+        this.token = token;
+        this.baseUrl = baseUrl;
+        this.unsafe = unsafe;
     }
 
 
@@ -116,6 +120,7 @@ public class BitGoClientImpl implements BitGoClient {
             data.put("minConfirms", minConfirms);
         }
         data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
+
         log.info("sendMany {}", data);
         data.put("walletPassphrase", walletPass);
         HttpURLConnection conn = httpPost(url, data);
@@ -167,38 +172,73 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public WalletTransactionResponse listWalletTransfers(String coin, String walletId, String prevId) throws IOException {
-        String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId) + "?limit=100";  //TODO reexamine later
+    public WalletTransferResponse listWalletTransfers(String coin, String walletId, String prevId, int limit) throws IOException {
+        if (limit > 250) limit = 250;
+        if (limit < 25) limit = 25;
+        String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId) + "?limit=" + limit;
 
         Map<String, String> reqPropMap = null;
-        if (prevId != null){
+        if (prevId != null) {
             reqPropMap = new HashMap<>();
             reqPropMap.put("prevId", prevId);
         }
         HttpURLConnection conn = httpGet(url, reqPropMap);
 
-        final WalletTransactionResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
+        final WalletTransferResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransferResponse.class);
         log.trace("listWalletTransactions response: {}", resp);
         return resp;
     }
 
     @Override
-    public int unlock(String otp, Long duration) throws IOException {
+    public int unlock(String otp, Long durationSecs) throws IOException {
         String url = baseUrl + UNLOCK_URL;
 
         final Map<String, Object> data = new HashMap<>();
         data.put("otp", otp);
-        if (duration != null) {
-            data.put("duration", duration);
+        if (durationSecs != null) {
+            data.put("duration", durationSecs);
         }
 
         HttpURLConnection conn = httpPost(url, data);
         return conn.getResponseCode();
     }
 
+    /**
+     * WALLET=5b6c7d15909e2d8a032abdf08b4929d8
+     * ACCESS_TOKEN=v2x16cd5d03485943f771446e1a3a5c34392e6e4e00587715bf3f1393b0e6dd152c
+     * <p>
+     * curl -X GET \
+     * -H "Content-Type: application/json" \
+     * -H "Authorization: Bearer $ACCESS_TOKEN" \
+     * https://test.bitgo.com/api/v1/wallet/$WALLET/tx
+     *
+     * @param walletId
+     * @return
+     * @throws IOException
+     */
+//    @Override
+    public WalletTransferResponse v1ListWalletTx(String walletId, long skip, int limit) throws IOException {
+        if (limit > 250) limit = 250;
+        if (limit < 25) limit = 25;
+
+
+        String url = baseUrl + V1_LIST_WALLET_TXN_URL.replace("$WALLET", walletId);
+
+        Map<String, String> reqPropMap = new HashMap<>();
+//        reqPropMap.put("skip", Long.toString(skip));
+//        reqPropMap.put("limit", Integer.toString(limit));
+
+        HttpURLConnection conn = httpGet(url, reqPropMap);
+
+        final WalletTransferResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransferResponse.class);
+        log.trace("listWalletTransactions response: {}", resp);
+        return resp;
+    }
+
     private HttpURLConnection httpPost(String url, Map<String, Object> data) throws IOException {
         return unsafe ? HttpHelper.postUnsafe(url, data, getAuth()) : HttpHelper.post(url, data, getAuth());
     }
+
     private HttpURLConnection httpGet(String url) throws IOException {
         return httpGet(url, null);
     }
@@ -208,13 +248,6 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     private String getAuth() {
-        final String auth;
-        if (longLivedToken == null) {
-            log.warn("TODO: implement auth with username/password");
-            auth = "TODO!";
-        } else {
-            auth = longLivedToken;
-        }
-        return auth;
+        return token;
     }
 }

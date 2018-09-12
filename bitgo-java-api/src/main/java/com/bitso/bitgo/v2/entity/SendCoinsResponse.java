@@ -1,8 +1,6 @@
-package com.bitso.bitgo;
+package com.bitso.bitgo.v2.entity;
 
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 /**
  * A response to the SendCoins/SendCoinsToMultipleAddresses request.

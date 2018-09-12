@@ -1,4 +1,4 @@
-package com.bitso.bitgo.entity;
+package com.bitso.bitgo.v2.entity;
 
 import lombok.Data;
 

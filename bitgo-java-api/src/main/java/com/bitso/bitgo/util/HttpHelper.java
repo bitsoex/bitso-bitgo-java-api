@@ -1,4 +1,4 @@
-package com.bitso.bitgo.impl;
+package com.bitso.bitgo.util;
 
 import lombok.extern.slf4j.Slf4j;
 

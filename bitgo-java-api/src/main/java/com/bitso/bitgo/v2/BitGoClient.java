@@ -1,7 +1,8 @@
-package com.bitso.bitgo;
+package com.bitso.bitgo.v2;
 
-import com.bitso.bitgo.entity.Wallet;
-import com.bitso.bitgo.entity.WalletTransactionResponse;
+import com.bitso.bitgo.v2.entity.SendCoinsResponse;
+import com.bitso.bitgo.v2.entity.Wallet;
+import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -77,10 +78,11 @@ public interface BitGoClient {
      * @param coin
      * @param walletId
      * @param nextBatchPrevId Optional
+     * @param limit
      * @return
      * @throws IOException
      */
-    WalletTransactionResponse listWalletTransfers(String coin, String walletId, String nextBatchPrevId) throws IOException;
+    WalletTransferResponse listWalletTransfers(String coin, String walletId, String nextBatchPrevId, int limit) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#unlock
@@ -88,7 +90,7 @@ public interface BitGoClient {
      * Body Parameters
      * @param otp 	An OTP code for the account obtained using the second factor authentication device
      * @param duration Optional - Desired duration of the unlock in seconds (default=600, max=3600)
-     * @return Errors WalletTransactionResponse Description:
+     * @return Errors WalletTransferResponse Description:
      * 400 Bad Request	The request parameters were missing or incorrect
      * 401 Unauthorized	The authentication parameters did not match, or OTP code was incorrect
      * @throws IOException
