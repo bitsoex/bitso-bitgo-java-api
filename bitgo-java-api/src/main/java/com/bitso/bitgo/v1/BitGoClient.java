@@ -18,6 +18,6 @@ public interface BitGoClient {
     Optional<Map<String, Object>> getCurrentUserProfile() throws IOException;
 
 
-    WalletTransactionResponse listWalletTransctions(String walletId, int skip, int limit) throws IOException;
+    WalletTransactionResponse listWalletTransctions(String walletId, long skip, int limit) throws IOException;
 
 }
