@@ -1,6 +1,8 @@
 package com.bitso.bitgo.v2.entity;
 
+import com.bitso.bitgo.util.DataScrub;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 /**
@@ -12,11 +14,13 @@ import lombok.Data;
 @Data
 public class Entry {
 
+    @JsonSerialize(using = DataScrub.StringSerializer.class)
     private String address;
+
     private int inputs;
     private int outputs;
     private long value;
-    private String valueString;
+//    private String valueString;  //Not needed
 
     private String wallet;
     private String coinName;

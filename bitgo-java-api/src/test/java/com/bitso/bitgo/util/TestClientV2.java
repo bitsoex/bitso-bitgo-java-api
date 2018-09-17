@@ -75,10 +75,16 @@ public class TestClientV2 {
 
     @Test
     public void listWalletTransfers() throws IOException {
-        final WalletTransferResponse list = client.listWalletTransfers(COIN, WALLET_ID, null, 250);
-        System.out.println("list.size() = " + list.getTransfers().size());
-        System.out.println("list = " + list);
-        assertTrue(list.getTransfers().size() > 10);
-        System.out.println(list);
+        final WalletTransferResponse resp = client.listWalletTransfers(COIN, WALLET_ID, null, 250);
+        System.out.println("list.size() = " + resp.getTransfers().size());
+        assertTrue(resp.getTransfers().size() > 10);
+//        System.out.println(resp);
+        for (int i = 0; i < 30; i++) {
+
+            resp.getTransfers().remove(0);
+        }
+        System.out.println("resp json = "+ SerializationUtil.mapper.writeValueAsString(resp));
+
+
     }
 }
