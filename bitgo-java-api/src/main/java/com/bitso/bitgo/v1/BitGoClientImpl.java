@@ -2,6 +2,7 @@ package com.bitso.bitgo.v1;
 
 import com.bitso.bitgo.util.HttpHelper;
 import com.bitso.bitgo.util.SerializationUtil;
+import com.bitso.bitgo.v1.entity.WalletAddressResponse;
 import com.bitso.bitgo.v1.entity.WalletTransactionResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class BitGoClientImpl implements BitGoClient {
 
     private static final String CURRENT_USER_PROFILE_URL = "/user/me";
     private static final String LIST_WALLET_TRANSACTION_URL = "/wallet/$WALLET/tx";
+    private static final String LIST_WALLET_ADDRESSES_URL = "/wallet/$WALLET/addresses";
 
     /**
      * The base URL (host, port, up to api/v1 for example
@@ -86,6 +88,24 @@ public class BitGoClientImpl implements BitGoClient {
 
         final WalletTransactionResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
         log.trace("listWalletTransctions response: {}", resp);
+        return resp;
+    }
+
+    @Override
+    public WalletAddressResponse listWalletAddress(String walletId, long skip, int limit) throws IOException {
+        if (limit > 500) limit = 500;
+        if (limit < 0) limit = 0;
+
+        String url = baseUrl + LIST_WALLET_ADDRESSES_URL.replace("$WALLET", walletId);
+
+        Map<String, String> reqPropMap = new HashMap<>();
+        reqPropMap.put("skip", Long.toString(skip));
+        reqPropMap.put("limit", Integer.toString(limit));
+
+        HttpURLConnection conn = httpGet(url, reqPropMap);
+
+        final WalletAddressResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletAddressResponse.class);
+        log.trace("listWalletAddress response: {}", resp);
         return resp;
     }
 

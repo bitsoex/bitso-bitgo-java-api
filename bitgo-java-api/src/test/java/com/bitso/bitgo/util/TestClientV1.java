@@ -2,6 +2,7 @@ package com.bitso.bitgo.util;
 
 import com.bitso.bitgo.v1.BitGoClient;
 import com.bitso.bitgo.v1.BitGoClientImpl;
+import com.bitso.bitgo.v1.entity.WalletAddressResponse;
 import com.bitso.bitgo.v1.entity.WalletTransactionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -31,6 +32,14 @@ public class TestClientV1 {
     public void currentUserProfile() throws IOException {
         final Optional<Map<String, Object>> profile = client.getCurrentUserProfile();
         Assert.assertNotNull(profile.get());
+    }
+
+    @Test
+    public void listWalletAddress() throws IOException {
+        final WalletAddressResponse resp = client.listWalletAddress(WALLET_ID, 0, 500);
+        System.out.println("list.size() = " + resp.getAddresses().size());
+        System.out.println("list = " + resp.getAddresses());
+        assertTrue(resp.getAddresses().size() > 1);
     }
 
     @Test

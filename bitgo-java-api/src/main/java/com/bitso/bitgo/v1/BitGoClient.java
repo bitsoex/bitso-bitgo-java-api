@@ -1,5 +1,6 @@
 package com.bitso.bitgo.v1;
 
+import com.bitso.bitgo.v1.entity.WalletAddressResponse;
 import com.bitso.bitgo.v1.entity.WalletTransactionResponse;
 
 import java.io.IOException;
@@ -20,4 +21,5 @@ public interface BitGoClient {
 
     WalletTransactionResponse listWalletTransctions(String walletId, long skip, int limit) throws IOException;
 
+    WalletAddressResponse listWalletAddress(String walletId, long skip, int limit) throws IOException;
 }

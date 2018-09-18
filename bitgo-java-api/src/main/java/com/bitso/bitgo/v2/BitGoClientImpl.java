@@ -203,38 +203,6 @@ public class BitGoClientImpl implements BitGoClient {
         return conn.getResponseCode();
     }
 
-    /**
-     * WALLET=5b6c7d15909e2d8a032abdf08b4929d8
-     * ACCESS_TOKEN=v2x16cd5d03485943f771446e1a3a5c34392e6e4e00587715bf3f1393b0e6dd152c
-     * <p>
-     * curl -X GET \
-     * -H "Content-Type: application/json" \
-     * -H "Authorization: Bearer $ACCESS_TOKEN" \
-     * https://test.bitgo.com/api/v1/wallet/$WALLET/tx
-     *
-     * @param walletId
-     * @return
-     * @throws IOException
-     */
-//    @Override
-    public WalletTransferResponse v1ListWalletTx(String walletId, long skip, int limit) throws IOException {
-        if (limit > 250) limit = 250;
-        if (limit < 25) limit = 25;
-
-
-        String url = baseUrl + V1_LIST_WALLET_TXN_URL.replace("$WALLET", walletId);
-
-        Map<String, String> reqPropMap = new HashMap<>();
-//        reqPropMap.put("skip", Long.toString(skip));
-//        reqPropMap.put("limit", Integer.toString(limit));
-
-        HttpURLConnection conn = httpGet(url, reqPropMap);
-
-        final WalletTransferResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransferResponse.class);
-        log.trace("listWalletTransactions response: {}", resp);
-        return resp;
-    }
-
     private HttpURLConnection httpPost(String url, Map<String, Object> data) throws IOException {
         return unsafe ? HttpHelper.postUnsafe(url, data, getAuth()) : HttpHelper.post(url, data, getAuth());
     }
