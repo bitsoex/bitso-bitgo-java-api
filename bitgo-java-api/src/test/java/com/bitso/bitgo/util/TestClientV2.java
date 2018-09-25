@@ -79,10 +79,9 @@ public class TestClientV2 {
         System.out.println("list.size() = " + resp.getTransfers().size());
         assertTrue(resp.getTransfers().size() > 10);
 //        System.out.println(resp);
-        for (int i = 0; i < 30; i++) {
-
-            resp.getTransfers().remove(0);
-        }
+//        for (int i = 0; i < 30; i++) {
+//            resp.getTransfers().remove(0);
+//        }
         System.out.println("resp json = "+ SerializationUtil.mapper.writeValueAsString(resp));
 
 

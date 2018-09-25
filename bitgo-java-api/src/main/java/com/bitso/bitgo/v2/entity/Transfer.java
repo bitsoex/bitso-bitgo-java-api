@@ -1,8 +1,6 @@
 package com.bitso.bitgo.v2.entity;
 
-import com.bitso.bitgo.util.DataScrub;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -22,14 +20,11 @@ public class Transfer {
     private String coin; //Digital currency of the wallet
     private String wallet;  //id of the wallet that sent this transaction
 
-
-    @JsonSerialize(using = DataScrub.StringSerializer.class)
     private String txid; // Transfer hash
     private long height; //	Height of the block
 
     private Date date; //	Date of the transaction
 
-    @JsonSerialize(using = DataScrub.StringSerializer.class)
     private String hex; //	Transfer Hex
     private BigDecimal usd;  //value of the total amount sent in USD
     private BigDecimal usdRate;  //price of the cryptocurrency being sent in USD/base_unit

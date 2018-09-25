@@ -1,8 +1,6 @@
 package com.bitso.bitgo.v2.entity;
 
-import com.bitso.bitgo.util.DataScrub;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,10 +14,8 @@ import java.math.BigDecimal;
 @Data
 public class Output {
 
-    @JsonSerialize(using = DataScrub.HashColonSerializer.class)
     private String id;
 
-    @JsonSerialize(using = DataScrub.StringSerializer.class)
     private String address;
 
     private BigDecimal value;

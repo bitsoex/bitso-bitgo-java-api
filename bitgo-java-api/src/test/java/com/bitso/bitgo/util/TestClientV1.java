@@ -47,6 +47,6 @@ public class TestClientV1 {
         final WalletTransactionResponse resp = client.listWalletTransctions(WALLET_ID, 0, 250);
         System.out.println("list.size() = " + resp.getTransactions().size());
         System.out.println("list = " + resp.getTransactions());
-        assertTrue(resp.getTransactions().size() > 10);
+        assertTrue(resp.getTransactions().size() > 0);
     }
 }
