@@ -37,9 +37,8 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String LIST_WALLET_TRANSFER_URL = "/$COIN/wallet/$WALLET/transfer";
     private static final String UNLOCK_URL = "/user/unlock";
 
-    private static final String V1_LIST_WALLET_TXN_URL = "/wallet/$WALLET/tx";
     /**
-     * The base URL (host, port, up to api/v1 for example
+     * The base URL (host, port, up to api/v2 for example
      */
     @Getter
     @Setter

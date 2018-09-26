@@ -74,7 +74,7 @@ public class BitGoClientImpl implements BitGoClient {
      * @throws IOException
      */
     @Override
-    public WalletTransactionResponse listWalletTransctions(String walletId, long skip, int limit) throws IOException {
+    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit) throws IOException {
         if (limit > 250) limit = 250;
         if (limit < 0) limit = 0;
 
@@ -87,7 +87,7 @@ public class BitGoClientImpl implements BitGoClient {
         HttpURLConnection conn = httpGet(url, reqPropMap);
 
         final WalletTransactionResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
-        log.trace("listWalletTransctions response: {}", resp);
+        log.trace("listWalletTransactions response: {}", resp);
         return resp;
     }
 
