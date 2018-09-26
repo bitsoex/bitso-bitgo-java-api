@@ -1,18 +1,17 @@
-package com.bitso.bitgo;
+package com.bitso.bitgo.v2.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * An abstract response object from BitGo.
  *
  * @author Enrique Zamudio
- *         Date: 5/8/17 4:48 PM
+ * Date: 5/8/17 4:48 PM
  */
+@Data
 public abstract class AbstractResponse {
 
-    @Setter @Getter
     private String status;
-    @Setter @Getter
     private String error;
+    private int responseCode;
 }
