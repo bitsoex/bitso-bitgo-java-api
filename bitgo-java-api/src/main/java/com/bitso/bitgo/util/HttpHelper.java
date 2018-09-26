@@ -110,8 +110,6 @@ public class HttpHelper {
             throws IOException {
 
         conn.setRequestMethod("POST");
-//        conn.setRequestProperty("Content-Type", "application/json");
-//        conn.setRequestProperty("Authorization", "Bearer " + auth);
 
         final byte[] buf = SerializationUtil.mapper.writeValueAsBytes(data);
         conn.setFixedLengthStreamingMode(buf.length);
