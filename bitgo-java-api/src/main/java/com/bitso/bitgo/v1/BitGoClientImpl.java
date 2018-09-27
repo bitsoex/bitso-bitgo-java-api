@@ -74,7 +74,7 @@ public class BitGoClientImpl implements BitGoClient {
      * @throws IOException
      */
     @Override
-    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit) throws IOException {
+    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit, Integer minHeight, Integer maxHeight, Integer minConfirms) throws IOException {
         if (limit > 250) limit = 250;
         if (limit < 0) limit = 0;
 
@@ -83,6 +83,9 @@ public class BitGoClientImpl implements BitGoClient {
         Map<String, String> reqPropMap = new HashMap<>();
         reqPropMap.put("skip", Long.toString(skip));
         reqPropMap.put("limit", Integer.toString(limit));
+        if (minHeight != null) reqPropMap.put("minHeight", minHeight.toString());
+        if (maxHeight != null) reqPropMap.put("maxHeight", maxHeight.toString());
+        if (minConfirms != null) reqPropMap.put("minConfirms", minConfirms.toString());
 
         HttpURLConnection conn = httpGet(url, reqPropMap);
 
