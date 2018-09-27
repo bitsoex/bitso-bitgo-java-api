@@ -74,7 +74,7 @@ public class BitGoClientImpl implements BitGoClient {
      * @throws IOException
      */
     @Override
-    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit, Integer minHeight, Integer maxHeight, Integer minConfirms) throws IOException {
+    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit, Long minHeight, Long maxHeight, Integer minConfirms) throws IOException {
         if (limit > 250) limit = 250;
         if (limit < 0) limit = 0;
 
