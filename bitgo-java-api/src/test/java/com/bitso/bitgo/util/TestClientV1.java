@@ -44,7 +44,7 @@ public class TestClientV1 {
 
     @Test
     public void listWalletTransfers() throws IOException {
-        final WalletTransactionResponse resp = client.listWalletTransactions(WALLET_ID, 0, 250);
+        final WalletTransactionResponse resp = client.listWalletTransactions(WALLET_ID, 0, 250, null, null, null);
         System.out.println("list.size() = " + resp.getTransactions().size());
         System.out.println("list = " + resp.getTransactions());
         assertTrue(resp.getTransactions().size() > 0);

@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the BitGo client.
@@ -74,7 +75,7 @@ public class BitGoClientImpl implements BitGoClient {
      * @throws IOException
      */
     @Override
-    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit) throws IOException {
+    public WalletTransactionResponse listWalletTransactions(String walletId, long skip, int limit, Long minHeight, Long maxHeight, Integer minConfirms) throws IOException {
         if (limit > 250) limit = 250;
         if (limit < 0) limit = 0;
 
@@ -83,8 +84,32 @@ public class BitGoClientImpl implements BitGoClient {
         Map<String, String> reqPropMap = new HashMap<>();
         reqPropMap.put("skip", Long.toString(skip));
         reqPropMap.put("limit", Integer.toString(limit));
+        if (minHeight != null) reqPropMap.put("minHeight", minHeight.toString());
+        if (maxHeight != null) reqPropMap.put("maxHeight", maxHeight.toString());
+        if (minConfirms != null) reqPropMap.put("minConfirms", minConfirms.toString());
 
-        HttpURLConnection conn = httpGet(url, reqPropMap);
+        HttpURLConnection conn = null;
+
+        //TODO make these parameters configurable, apply to all our calls, not just this one.  
+        int retryCounter = 0;
+        while (retryCounter < 3) {
+            conn = httpGet(url, reqPropMap);
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                break;
+            } else if (conn.getResponseCode() >= 500 && conn.getResponseCode() < 600) {  //524 only?
+                long sleepTimeMillis = TimeUnit.SECONDS.toMillis(5);
+                log.info("Got responseCode={} with message={}, sleeping for {}ms, retryCounter={}", conn.getResponseCode(), conn.getResponseMessage(), sleepTimeMillis, retryCounter);
+                try {
+                    Thread.sleep(sleepTimeMillis);
+                } catch (InterruptedException e) {
+                    log.error("Error", e);
+                }
+                retryCounter++;
+            } else {
+                //Some other exception, don't retry
+                break;
+            }
+        }
 
         final WalletTransactionResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransactionResponse.class);
         log.trace("listWalletTransactions response: {}", resp);
