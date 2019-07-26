@@ -14,7 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the BitGo client.
@@ -181,7 +187,7 @@ public class BitGoClientImpl implements BitGoClient {
             reqPropMap = new HashMap<>();
             reqPropMap.put("prevId", prevId);
         }
-        HttpURLConnection conn = httpGet(url, reqPropMap);
+        HttpURLConnection conn = httpGetRetry500(url, reqPropMap);
 
         final WalletTransferResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransferResponse.class);
         log.trace("listWalletTransactions response: {}", resp);
@@ -212,6 +218,32 @@ public class BitGoClientImpl implements BitGoClient {
 
     private HttpURLConnection httpGet(String url, Map<String, String> reqParams) throws IOException {
         return unsafe ? HttpHelper.getUnsafe(url, getAuth(), reqParams) : HttpHelper.get(url, getAuth(), reqParams);
+    }
+
+    private HttpURLConnection httpGetRetry500(String url, Map<String, String> reqParams) throws IOException {
+
+        HttpURLConnection conn = null;
+
+        int retryCounter = 0;
+        while (retryCounter < 3) {
+            conn = unsafe ? HttpHelper.getUnsafe(url, getAuth(), reqParams) : HttpHelper.get(url, getAuth(), reqParams);
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                break;
+            } else if (conn.getResponseCode() >= 500 && conn.getResponseCode() < 600) {
+                long sleepTimeMillis = TimeUnit.SECONDS.toMillis(5);
+                log.info("Got responseCode={} with message={}, sleeping for {}ms, retryCounter={}", conn.getResponseCode(), conn.getResponseMessage(), sleepTimeMillis, retryCounter);
+                try {
+                    Thread.sleep(sleepTimeMillis);
+                } catch (InterruptedException e) {
+                    log.error("Error", e);
+                }
+                retryCounter++;
+            } else {
+                //Some other exception, don't retry
+                break;
+            }
+        }
+        return conn;
     }
 
     private String getAuth() {
