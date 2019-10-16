@@ -37,6 +37,7 @@ public class BitGoClientImpl implements BitGoClient {
     private static final String SEND_MANY_URL = "/$COIN/wallet/$WALLET/sendmany";
     private static final String LIST_WALLETS_URL = "/$COIN/wallet";
     private static final String GET_WALLET_URL = "/$COIN/wallet/";
+    private static final String GET_WALLET_ADDRESS_URL = GET_WALLET_URL + "address/";
     private static final String CURRENT_USER_PROFILE_URL = "/user/me";
     private static final String GET_WALLET_TRANSFER_URL = "/$COIN/wallet/$WALLET/transfer/$TRANSFER";
     private static final String GET_WALLET_TRANSFER_SEQ_URL = "/$COIN/wallet/$WALLET/transfer/sequenceId/$SEQUENCE";
@@ -88,6 +89,17 @@ public class BitGoClientImpl implements BitGoClient {
 
         final Wallet resp = SerializationUtil.mapper.readValue(conn.getInputStream(), Wallet.class);
         log.trace("Wallet {} getWallet response: {}", wid, resp);
+        return Optional.of(resp);
+    }
+
+    @Override
+    public Optional<Wallet> getWalletByAddress(String coin, String waddress) throws IOException {
+        String url = baseUrl + GET_WALLET_ADDRESS_URL.replace("$COIN", coin) + waddress;
+
+        HttpURLConnection conn = httpGet(url);
+
+        final Wallet resp = SerializationUtil.mapper.readValue(conn.getInputStream(), Wallet.class);
+        log.trace("Wallet address {} getWallet response: {}", waddress, resp);
         return Optional.of(resp);
     }
 

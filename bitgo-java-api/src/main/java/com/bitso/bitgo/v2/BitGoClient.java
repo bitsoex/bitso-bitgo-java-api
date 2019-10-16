@@ -32,6 +32,12 @@ public interface BitGoClient {
     Optional<Wallet> getWallet(String coin, String wid) throws IOException;
 
     /**
+     * Get the wallet by providing an address and currency.
+     * See https://www.bitgo.com/api/v2/?shell#operation/v2.wallet.getwalletbyaddress
+     */
+    Optional<Wallet> getWalletByAddress(String coin, String waddress) throws IOException;
+
+    /**
      * Invokes the sendmany method see https://www.bitgo.com/api/v2/?shell#send-transaction-to-many
      *
      * @param coin                        tbtc for test bitcoin, see full list at https://www.bitgo.com/api/v2/#coin-digital-currency-support
