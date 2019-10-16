@@ -2,7 +2,7 @@ apply plugin:'java'
 apply plugin:'idea'
 
 group = 'com.bitso'
-version='SNAPSHOT'
+version='0.0.8'
 
 repositories {
     mavenCentral()
