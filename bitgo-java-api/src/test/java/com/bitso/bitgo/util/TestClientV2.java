@@ -31,10 +31,11 @@ public class TestClientV2 {
 
     public static final String WALLET_ID = System.getenv("WALLET_ID");
     public static final String WALLET_PASSPHRASE = System.getenv("WALLET_PASSPHRASE");
+    public static final String WALLET_ADDRESS = System.getenv("WALLET_ADDRESS");
     public static final String TOKEN = System.getenv("TOKEN");
     private static final String COIN = System.getenv("COIN");
     private static final String TLTC_TEST_FAUCET_ADDRESS = "mgTbDyNGwJeewjdXmU9cRQe8WDauVqn4WK";
-    private final BitGoClient client = new BitGoClientImpl(TOKEN, "https://localhost:3080/api/v2", true);
+    private final BitGoClient client = new BitGoClientImpl(TOKEN, "http://localhost:3080/api/v2", true);
 
 
     @Test
@@ -65,6 +66,13 @@ public class TestClientV2 {
         List<Wallet> wallets = client.listWallets(COIN);
         Assert.assertNotNull(wallets);
         Assert.assertFalse(wallets.isEmpty());
+    }
+
+    @Test
+    public void getWalletByAddress() throws Exception {
+        Optional<Wallet> wallet = client.getWalletByAddress(COIN, WALLET_ADDRESS);
+        Assert.assertNotNull(wallet);
+        Assert.assertFalse(wallet.isEmpty());
     }
 
     @Test
