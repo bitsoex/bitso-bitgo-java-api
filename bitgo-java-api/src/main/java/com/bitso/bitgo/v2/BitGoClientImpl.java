@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
+
 /**
  * Implementation of the BitGo client.
  *
@@ -104,12 +106,25 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<SendCoinsResponse> sendMany(String coin, String walletId, String walletPass,
-                                                Map<String, BigDecimal> recipients,
-                                                String sequenceId, String message,
-                                                BigDecimal fee, BigDecimal feeTxConfirmTarget,
-                                                int minConfirms, boolean enforceMinConfirmsForChange)
-            throws IOException {
+    public Optional<SendCoinsResponse> sendMany(JSONObject parameters) throws IOException {
+        // Get all needed parameters
+        String coin = parameters.getString("coin");
+        String walletId = parameters.getString("walletId");
+        String walletPass = parameters.getString("walletPass");
+        JSONObject targets = parameters.getJSONObject("recipients");
+        HashMap<String, BigDecimal> recipients = new HashMap<String, BigDecimal>(targets.length());
+        for (String address : targets.keySet()) {
+            recipients.put(address, targets.getBigDecimal(address));
+        }
+        String sequenceId = parameters.getString("sequenceId");
+        // Check for optional parameters or default them
+        String message = parameters.has("message") ? parameters.getString("message") : "";
+        BigDecimal fee = parameters.has("fee") ? parameters.getBigDecimal("fee") : BigDecimal.ZERO;
+        BigDecimal feeTxConfirmTarget = parameters.has("feeTxConfirmTarget") ?
+                parameters.getBigDecimal("feeTxConfirmTarget") : BigDecimal.ZERO;
+        int minConfirms = parameters.has("minConfirms") ? parameters.getInt("minConfirms") : 0;
+        boolean enforceMinConfirmsForChange = parameters.has("enforceMinConfirmsForChange") ?
+                parameters.getBoolean("enforceMinConfirmsForChange") : false;
         String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
 
         final List<Map<String, Object>> addr = new ArrayList<>(recipients.size());

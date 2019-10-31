@@ -6,6 +6,7 @@ import com.bitso.bitgo.v2.entity.SendCoinsResponse;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class TestClientV2 {
     @Test
     @Ignore
     public void testSendMany() throws IOException {
-
+        JSONObject parameters = new JSONObject();
         int unlockResult = client.unlock("0000000", TimeUnit.HOURS.toSeconds(1));
         System.out.println(unlockResult);
         assertTrue(unlockResult != 400 && unlockResult != 401);
@@ -52,9 +53,15 @@ public class TestClientV2 {
             targets.put(TLTC_TEST_FAUCET_ADDRESS, amount);
             amount = amount.add(initAmount);
         }
-//        targets.put("[ADDRESS2]", new BigDecimal("0.001"));
-        Optional<SendCoinsResponse> resp = client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, null,
-                "test", null, null, 1, true);
+        parameters.put("coin", COIN);
+        parameters.put("walletId", WALLET_ID);
+        parameters.put("walletPass", WALLET_PASSPHRASE);
+        parameters.put("recipients", targets);
+        parameters.put("message", "test");
+        parameters.put("minConfirms", 1);
+        parameters.put("enforceMinConfirmsForChange", true);
+        parameters.put("sequenceId", "btc33");
+        Optional<SendCoinsResponse> resp = client.sendMany(parameters);
         Assert.assertTrue(resp.isPresent());
         Assert.assertNotNull(resp.get().getTx());
 
@@ -90,7 +97,7 @@ public class TestClientV2 {
 //        for (int i = 0; i < 30; i++) {
 //            resp.getTransfers().remove(0);
 //        }
-        System.out.println("resp json = "+ SerializationUtil.mapper.writeValueAsString(resp));
+        System.out.println("resp json = " + SerializationUtil.mapper.writeValueAsString(resp));
 
 
     }
