@@ -3,10 +3,8 @@ package com.bitso.bitgo.v2;
 import com.bitso.bitgo.v2.entity.SendCoinsResponse;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +45,7 @@ public interface BitGoClient {
      * recipients                  A map with the recipients' addresses as keys and the corresponding
      *                                    amounts as values. Amounts are in satoshis
      * sequenceId                  A unique identifier for this transaction (optional).
+     *
      * Optional parameters are:
      * message                     Notes about the transaction (optional).
      * fee                         Fee (in satoshis), leave null for autodetect. Do not specify unless you are sure it is sufficient.
@@ -55,7 +54,7 @@ public interface BitGoClient {
      * enforceMinConfirmsForChange Defaults to false. When constructing a transaction, minConfirms will only be enforced for unspents not originating from the wallet
      * @return A SendCoinsResponse, or empty if there was a problem (although more likely in case of a problem it will throw).
      */
-    Optional<SendCoinsResponse> sendMany(JSONObject parameters) throws IOException;
+    Optional<SendCoinsResponse> sendMany(Map<String, Object> parameters) throws IOException;
 
     Optional<Map<String, Object>> getCurrentUserProfile() throws IOException;
 

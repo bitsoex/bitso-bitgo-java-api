@@ -22,8 +22,6 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONObject;
-
 /**
  * Implementation of the BitGo client.
  *
@@ -106,27 +104,28 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<SendCoinsResponse> sendMany(JSONObject parameters) throws IOException {
+    public Optional<SendCoinsResponse> sendMany(Map<String, Object> parameters) throws IOException {
         // Get all needed parameters
-        String coin = parameters.getString("coin");
-        String walletId = parameters.getString("walletId");
-        String walletPass = parameters.getString("walletPass");
-        JSONObject targets = parameters.getJSONObject("recipients");
-        HashMap<String, BigDecimal> recipients = new HashMap<String, BigDecimal>(targets.length());
+        String coin = parameters.get("coin").toString();
+        String walletId = parameters.get("walletId").toString();
+        String walletPass = parameters.get("walletPass").toString();
+        Map<String, Object> targets = (Map<String, Object>)parameters.get("recipients");
+        HashMap<String, BigDecimal> recipients = new HashMap<String, BigDecimal>(targets.size());
         for (String address : targets.keySet()) {
-            recipients.put(address, targets.getBigDecimal(address));
+            recipients.put(address, new BigDecimal(targets.get(address).toString()));
         }
-        String sequenceId = parameters.getString("sequenceId");
-        // Check for optional parameters or default them
-        String message = parameters.has("message") ? parameters.getString("message") : "";
-        BigDecimal fee = parameters.has("fee") ? parameters.getBigDecimal("fee") : BigDecimal.ZERO;
-        BigDecimal feeTxConfirmTarget = parameters.has("feeTxConfirmTarget") ?
-                parameters.getBigDecimal("feeTxConfirmTarget") : BigDecimal.ZERO;
-        int minConfirms = parameters.has("minConfirms") ? parameters.getInt("minConfirms") : 0;
-        boolean enforceMinConfirmsForChange = parameters.has("enforceMinConfirmsForChange") ?
-                parameters.getBoolean("enforceMinConfirmsForChange") : false;
-        String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+        String sequenceId = parameters.get("sequenceId").toString();
 
+        // Check for optional parameters or default them to null
+        String message = parameters.containsKey("message") ? parameters.get("message").toString() : null;
+        BigDecimal fee = parameters.containsKey("fee") ? new BigDecimal(parameters.get("fee").toString()) : null;
+        BigDecimal feeTxConfirmTarget = parameters.containsKey("feeTxConfirmTarget") ?
+                new BigDecimal(parameters.get("feeTxConfirmTarget").toString()) : null;
+        int minConfirms = parameters.containsKey("minConfirms") ? Integer.parseInt(parameters.get("minConfirms").toString()) : null;
+        boolean enforceMinConfirmsForChange = parameters.containsKey("enforceMinConfirmsForChange") ?
+                Boolean.valueOf(parameters.get("enforceMinConfirmsForChange").toString()) : null;
+
+        String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
         final List<Map<String, Object>> addr = new ArrayList<>(recipients.size());
         for (Map.Entry<String, BigDecimal> e : recipients.entrySet()) {
             Map<String, Object> a = new HashMap<>(2);

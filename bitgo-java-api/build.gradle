@@ -15,7 +15,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.2'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.2'
     compile 'org.slf4j:slf4j-api:1.7.25',
-            'com.fasterxml.jackson.core:jackson-databind:2.9.7',
-            'org.json:json:20190722'
+            'com.fasterxml.jackson.core:jackson-databind:2.9.7'
     testCompile 'junit:junit:4.12'
 }
