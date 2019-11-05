@@ -109,7 +109,7 @@ public class BitGoClientImpl implements BitGoClient {
                                                 @NonNull Map<String, BigDecimal> recipients, @NonNull String sequenceId,
                                                 Map<String, Object> optionalParameters) throws IOException {
         // Validate all needed parameters
-        if (!coin.matches("^(btc|ltc|bch|tbtc|tltc|tbch)$")) {
+        if (coin.equals("")) {
             throw new IOException("Invalid currency");
         }
         if (walletId.equals("")) {
