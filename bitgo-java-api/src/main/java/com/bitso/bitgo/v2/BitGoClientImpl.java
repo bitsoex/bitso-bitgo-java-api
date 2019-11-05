@@ -130,7 +130,7 @@ public class BitGoClientImpl implements BitGoClient {
         for (Map.Entry<String, BigDecimal> e : recipients.entrySet()) {
             Map<String, Object> a = new HashMap<>(2);
             a.put("address", e.getKey());
-            a.put("amount", e.getValue().longValue());
+            a.put("amount", e.getValue().toBigInteger());
             addr.add(a);
         }
         final Map<String, Object> data = new HashMap<>();
@@ -140,46 +140,56 @@ public class BitGoClientImpl implements BitGoClient {
 
         // Check for optional parameters or default them to null
         if (optionalParameters != null) {
-            Object message = optionalParameters.containsKey("message") ? optionalParameters.get("message") : null;
-            Object fee = optionalParameters.containsKey("fee") ? optionalParameters.get("fee") : null;
-            Object feeTxConfirmTarget = optionalParameters.containsKey("feeTxConfirmTarget") ?
-                    optionalParameters.get("feeTxConfirmTarget") : null;
-            Object minConfirms = optionalParameters.containsKey("minConfirms") ? optionalParameters.get("minConfirms") : null;
-            Object enforceMinConfirmsForChange = optionalParameters.containsKey("enforceMinConfirmsForChange") ?
-                    optionalParameters.get("enforceMinConfirmsForChange") : null;
-            if (message != null) {
-                if (message.getClass().getName().equals(String.class.getName())) {
-                    data.put("message", message.toString());
+            String optionalKey;
+            Object optionalValue;
+            for (Map.Entry<String, Object> currentParameter : optionalParameters.entrySet()) {
+                optionalKey = currentParameter.getKey();
+                optionalValue = currentParameter.getValue();
+                if (optionalKey.equals("message")) {
+                    if (optionalValue != null) {
+                        if (optionalValue.getClass().getName().equals(String.class.getName())) {
+                            data.put(optionalKey, optionalValue.toString());
+                        } else {
+                            throw new IOException("Message should be a String value");
+                        }
+                    }
+                } else if (optionalKey.equals("fee")) {
+                    if (optionalValue != null) {
+                        if (optionalValue.getClass().getName().equals(BigDecimal.class.getName())) {
+                            data.put(optionalKey, ((BigDecimal) optionalValue).toBigInteger());
+                        } else {
+                            throw new IOException("Fee should be a BigDecimal value");
+                        }
+                    }
+                } else if (optionalKey.equals("feeTxConfirmTarget")) {
+                    if (optionalValue != null) {
+                        if (optionalValue.getClass().getName().equals(BigDecimal.class.getName())) {
+                            data.put(optionalKey, optionalValue);
+                        } else {
+                            throw new IOException("FeeTxConfirmTarget should be a BigDecimal value");
+                        }
+                    }
+                } else if (optionalKey.equals("minConfirms")) {
+                    if (optionalValue != null) {
+                        if (optionalValue.getClass().getName().equals(Integer.class.getName()) && ((int) optionalValue > 0)) {
+                            data.put(optionalKey, optionalValue);
+                        } else {
+                            throw new IOException("MinConfirms should be an Integer value higher than 0");
+                        }
+                    }
+                } else if (optionalKey.equals("enforceMinConfirmsForChange")) {
+                    if (optionalValue != null) {
+                        if (optionalValue.getClass().getName().equals(Boolean.class.getName())) {
+                            data.put(optionalKey, optionalValue);
+                        } else {
+                            throw new IOException("EnforceMinConfirmsForChange should be a Boolean value");
+                        }
+                    }
                 } else {
-                    throw new IOException("Message should be a String value");
-                }
-            }
-            if (fee != null) {
-                if (fee.getClass().getName().equals(BigDecimal.class.getName())) {
-                    data.put("fee", ((BigDecimal) fee).longValue());
-                } else {
-                    throw new IOException("Fee should be a BigDecimal value");
-                }
-            }
-            if (feeTxConfirmTarget != null) {
-                if (feeTxConfirmTarget.getClass().getName().equals(BigDecimal.class.getName())) {
-                    data.put("feeTxConfirmTarget", feeTxConfirmTarget);
-                } else {
-                    throw new IOException("FeeTxConfirmTarget should be a BigDecimal value");
-                }
-            }
-            if (minConfirms != null) {
-                if (minConfirms.getClass().getName().equals(Integer.class.getName()) && ((int) minConfirms > 0)) {
-                    data.put("minConfirms", minConfirms);
-                } else {
-                    throw new IOException("MinConfirms should be an Integer value higher than 0");
-                }
-            }
-            if (enforceMinConfirmsForChange != null) {
-                if (enforceMinConfirmsForChange.getClass().getName().equals(Boolean.class.getName())) {
-                    data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
-                } else {
-                    throw new IOException("EnforceMinConfirmsForChange should be a Boolean value");
+                    // Unknown parameter for validation, if not null allow it to pass to the transaction request
+                    if (optionalValue != null) {
+                        data.put(optionalKey, optionalValue);
+                    }
                 }
             }
         }

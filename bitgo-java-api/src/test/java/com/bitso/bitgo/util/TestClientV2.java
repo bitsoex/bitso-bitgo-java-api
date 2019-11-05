@@ -55,7 +55,7 @@ public class TestClientV2 {
         parameters.put("message", "test");
         parameters.put("minConfirms", 1);
         parameters.put("enforceMinConfirmsForChange", true);
-        String sequenceId = "btc35"; //Set it up for transaction to work
+        String sequenceId = ""; //Set it up for transaction to work
         Optional<SendCoinsResponse> resp = client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, parameters);
         Assert.assertTrue(resp.isPresent());
         Assert.assertNotNull(resp.get().getTx());
