@@ -8,6 +8,7 @@ import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,26 +105,25 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<SendCoinsResponse> sendMany(Map<String, Object> parameters) throws IOException {
-        // Get all needed parameters
-        String coin = parameters.get("coin").toString();
-        String walletId = parameters.get("walletId").toString();
-        String walletPass = parameters.get("walletPass").toString();
-        Map<String, Object> targets = (Map<String, Object>)parameters.get("recipients");
-        HashMap<String, BigDecimal> recipients = new HashMap<String, BigDecimal>(targets.size());
-        for (String address : targets.keySet()) {
-            recipients.put(address, new BigDecimal(targets.get(address).toString()));
+    public Optional<SendCoinsResponse> sendMany(@NonNull String coin, @NonNull String walletId, @NonNull String walletPass,
+                                                @NonNull Map<String, BigDecimal> recipients, @NonNull String sequenceId,
+                                                Map<String, Object> optionalParameters) throws IOException {
+        // Validate all needed parameters
+        if (!coin.matches("^(btc|ltc|bch|tbtc|tltc|tbch)$")) {
+            throw new IOException("Invalid currency");
         }
-        String sequenceId = parameters.get("sequenceId").toString();
-
-        // Check for optional parameters or default them to null
-        String message = parameters.containsKey("message") ? parameters.get("message").toString() : null;
-        BigDecimal fee = parameters.containsKey("fee") ? new BigDecimal(parameters.get("fee").toString()) : null;
-        BigDecimal feeTxConfirmTarget = parameters.containsKey("feeTxConfirmTarget") ?
-                new BigDecimal(parameters.get("feeTxConfirmTarget").toString()) : null;
-        int minConfirms = parameters.containsKey("minConfirms") ? Integer.parseInt(parameters.get("minConfirms").toString()) : null;
-        boolean enforceMinConfirmsForChange = parameters.containsKey("enforceMinConfirmsForChange") ?
-                Boolean.valueOf(parameters.get("enforceMinConfirmsForChange").toString()) : null;
+        if (walletId.equals("")) {
+            throw new IOException("WalletId can't be empty");
+        }
+        if (walletPass.equals("")) {
+            throw new IOException("WalletPass can't be empty ");
+        }
+        if (sequenceId.equals("")) {
+            throw new IOException("SequenceId can't be empty");
+        }
+        if (recipients.size() == 0) {
+            throw new IOException("Transaction must have at least one address/amount tuple as destination");
+        }
 
         String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
         final List<Map<String, Object>> addr = new ArrayList<>(recipients.size());
@@ -135,25 +135,56 @@ public class BitGoClientImpl implements BitGoClient {
         }
         final Map<String, Object> data = new HashMap<>();
         data.put("recipients", addr);
-        if (message != null) {
-            data.put("message", message);
+        data.put("walletPassphrase", walletPass);
+        data.put("sequenceId", sequenceId);
+
+        // Check for optional parameters or default them to null
+        if (optionalParameters != null) {
+            Object message = optionalParameters.containsKey("message") ? optionalParameters.get("message") : null;
+            Object fee = optionalParameters.containsKey("fee") ? optionalParameters.get("fee") : null;
+            Object feeTxConfirmTarget = optionalParameters.containsKey("feeTxConfirmTarget") ?
+                    optionalParameters.get("feeTxConfirmTarget") : null;
+            Object minConfirms = optionalParameters.containsKey("minConfirms") ? optionalParameters.get("minConfirms") : null;
+            Object enforceMinConfirmsForChange = optionalParameters.containsKey("enforceMinConfirmsForChange") ?
+                    optionalParameters.get("enforceMinConfirmsForChange") : null;
+            if (message != null) {
+                if (message.getClass().getName().equals(String.class.getName())) {
+                    data.put("message", message.toString());
+                } else {
+                    throw new IOException("Message should be a String value");
+                }
+            }
+            if (fee != null) {
+                if (fee.getClass().getName().equals(BigDecimal.class.getName())) {
+                    data.put("fee", ((BigDecimal) fee).longValue());
+                } else {
+                    throw new IOException("Fee should be a BigDecimal value");
+                }
+            }
+            if (feeTxConfirmTarget != null) {
+                if (feeTxConfirmTarget.getClass().getName().equals(BigDecimal.class.getName())) {
+                    data.put("feeTxConfirmTarget", feeTxConfirmTarget);
+                } else {
+                    throw new IOException("FeeTxConfirmTarget should be a BigDecimal value");
+                }
+            }
+            if (minConfirms != null) {
+                if (minConfirms.getClass().getName().equals(Integer.class.getName()) && ((int) minConfirms > 0)) {
+                    data.put("minConfirms", minConfirms);
+                } else {
+                    throw new IOException("MinConfirms should be an Integer value higher than 0");
+                }
+            }
+            if (enforceMinConfirmsForChange != null) {
+                if (enforceMinConfirmsForChange.getClass().getName().equals(Boolean.class.getName())) {
+                    data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
+                } else {
+                    throw new IOException("EnforceMinConfirmsForChange should be a Boolean value");
+                }
+            }
         }
-        if (sequenceId != null) {
-            data.put("sequenceId", sequenceId);
-        }
-        if (fee != null) {
-            data.put("fee", fee.longValue());
-        }
-        if (feeTxConfirmTarget != null) {
-            data.put("feeTxConfirmTarget", feeTxConfirmTarget);
-        }
-        if (minConfirms > 0) {
-            data.put("minConfirms", minConfirms);
-        }
-        data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
 
         log.info("sendMany {}", data);
-        data.put("walletPassphrase", walletPass);
         HttpURLConnection conn = httpPost(url, data);
         if (conn == null) {
             return Optional.empty();

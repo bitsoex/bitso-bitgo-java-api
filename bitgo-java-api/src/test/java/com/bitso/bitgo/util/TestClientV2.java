@@ -6,7 +6,6 @@ import com.bitso.bitgo.v2.entity.SendCoinsResponse;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -53,15 +52,11 @@ public class TestClientV2 {
             targets.put(TLTC_TEST_FAUCET_ADDRESS, amount);
             amount = amount.add(initAmount);
         }
-        parameters.put("coin", COIN);
-        parameters.put("walletId", WALLET_ID);
-        parameters.put("walletPass", WALLET_PASSPHRASE);
-        parameters.put("recipients", targets);
         parameters.put("message", "test");
         parameters.put("minConfirms", 1);
         parameters.put("enforceMinConfirmsForChange", true);
-        parameters.put("sequenceId", ""); //Set it up for transaction to work
-        Optional<SendCoinsResponse> resp = client.sendMany(parameters);
+        String sequenceId = "btc35"; //Set it up for transaction to work
+        Optional<SendCoinsResponse> resp = client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, parameters);
         Assert.assertTrue(resp.isPresent());
         Assert.assertNotNull(resp.get().getTx());
 
@@ -70,7 +65,6 @@ public class TestClientV2 {
     @Test
     @Ignore
     public void testSendManyFail() throws IOException {
-        Map<String, Object> parameters = new HashMap<String, Object>();
         int unlockResult = client.unlock("0000000", TimeUnit.HOURS.toSeconds(1));
         System.out.println(unlockResult);
         assertTrue(unlockResult != 400 && unlockResult != 401);
@@ -78,24 +72,33 @@ public class TestClientV2 {
         BigDecimal initAmount = new BigDecimal("0.001").movePointRight(8);
         BigDecimal amount = initAmount;
         targets.put(TLTC_TEST_FAUCET_ADDRESS, amount);
-        // avoid coin required parameter to test error handling
-        parameters.put("coin", "");
-        parameters.put("walletId", WALLET_ID);
-        parameters.put("walletPass", WALLET_PASSPHRASE);
-        parameters.put("recipients", targets);
-        parameters.put("message", "test");
-        parameters.put("minConfirms", 1);
-        parameters.put("enforceMinConfirmsForChange", true);
-        parameters.put("sequenceId", "btc34"); //Set it up for transaction to work
-        Optional<SendCoinsResponse> resp = client.sendMany(parameters);
-        // Coin is part of the URL of api, should not find the required page (also walletId is part of the URL)
-        Assert.assertEquals(404, resp.get().getResponseCode());
-        // Restart test swapping the wrong variable
-        parameters.put("coin", COIN);
-        parameters.put("sequenceId", "");
-        resp = client.sendMany(parameters);
-        Assert.assertEquals(400, resp.get().getResponseCode());
-        Assert.assertThat(resp.get().getError(), CoreMatchers.containsString("invalid sequence id"));
+        String sequenceId = "123";
+        // Send required COIN parameter as empty
+        try {
+            client.sendMany("", WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, null);
+        } catch (Exception e) {
+            Assert.assertEquals("Invalid currency", e.getMessage());
+        }
+        // Send COIN  parameter  misformed
+        try {
+            client.sendMany("abc", WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, null);
+        } catch (Exception e) {
+            Assert.assertEquals("Invalid currency", e.getMessage());
+        }
+        // Send required COIN parameter as null
+        try {
+            client.sendMany(null, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, null);
+        } catch (Exception e) {
+            Assert.assertEquals("coin is marked @NonNull but is null", e.getMessage());
+        }
+        // Send an optional parameter with a wrong type
+        try {
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("fee", "0");
+            client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, parameters);
+        } catch (Exception e) {
+            Assert.assertEquals("Fee should be a BigDecimal value", e.getMessage());
+        }
     }
 
     @Test
