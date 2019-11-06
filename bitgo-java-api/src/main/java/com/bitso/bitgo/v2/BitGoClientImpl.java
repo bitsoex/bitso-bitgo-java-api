@@ -109,16 +109,16 @@ public class BitGoClientImpl implements BitGoClient {
                                                 @NonNull Map<String, BigDecimal> recipients, @NonNull String sequenceId,
                                                 Map<String, Object> optionalParameters) throws IOException {
         // Validate all needed parameters
-        if (coin.equals("")) {
+        if (coin.isBlank()) {
             throw new IOException("Invalid currency");
         }
-        if (walletId.equals("")) {
+        if (walletId.isBlank()) {
             throw new IOException("WalletId can't be empty");
         }
-        if (walletPass.equals("")) {
+        if (walletPass.isBlank()) {
             throw new IOException("WalletPass can't be empty ");
         }
-        if (sequenceId.equals("")) {
+        if (sequenceId.isBlank()) {
             throw new IOException("SequenceId can't be empty");
         }
         if (recipients.size() == 0) {
@@ -147,15 +147,11 @@ public class BitGoClientImpl implements BitGoClient {
                 optionalValue = currentParameter.getValue();
                 if (optionalKey.equals("message")) {
                     if (optionalValue != null) {
-                        if (optionalValue.getClass().getName().equals(String.class.getName())) {
-                            data.put(optionalKey, optionalValue.toString());
-                        } else {
-                            throw new IOException("Message should be a String value");
-                        }
+                        data.put(optionalKey, optionalValue.toString());
                     }
                 } else if (optionalKey.equals("fee")) {
                     if (optionalValue != null) {
-                        if (optionalValue.getClass().getName().equals(BigDecimal.class.getName())) {
+                        if (optionalValue instanceof BigDecimal) {
                             data.put(optionalKey, ((BigDecimal) optionalValue).toBigInteger());
                         } else {
                             throw new IOException("Fee should be a BigDecimal value");
@@ -163,7 +159,7 @@ public class BitGoClientImpl implements BitGoClient {
                     }
                 } else if (optionalKey.equals("feeTxConfirmTarget")) {
                     if (optionalValue != null) {
-                        if (optionalValue.getClass().getName().equals(BigDecimal.class.getName())) {
+                        if (optionalValue instanceof BigDecimal) {
                             data.put(optionalKey, optionalValue);
                         } else {
                             throw new IOException("FeeTxConfirmTarget should be a BigDecimal value");
@@ -171,7 +167,7 @@ public class BitGoClientImpl implements BitGoClient {
                     }
                 } else if (optionalKey.equals("minConfirms")) {
                     if (optionalValue != null) {
-                        if (optionalValue.getClass().getName().equals(Integer.class.getName()) && ((int) optionalValue > 0)) {
+                        if (optionalValue instanceof Integer && ((int) optionalValue > 0)) {
                             data.put(optionalKey, optionalValue);
                         } else {
                             throw new IOException("MinConfirms should be an Integer value higher than 0");
@@ -179,17 +175,15 @@ public class BitGoClientImpl implements BitGoClient {
                     }
                 } else if (optionalKey.equals("enforceMinConfirmsForChange")) {
                     if (optionalValue != null) {
-                        if (optionalValue.getClass().getName().equals(Boolean.class.getName())) {
+                        if (optionalValue instanceof Boolean) {
                             data.put(optionalKey, optionalValue);
                         } else {
                             throw new IOException("EnforceMinConfirmsForChange should be a Boolean value");
                         }
                     }
-                } else {
+                } else if (optionalValue != null) {
                     // Unknown parameter for validation, if not null allow it to pass to the transaction request
-                    if (optionalValue != null) {
-                        data.put(optionalKey, optionalValue);
-                    }
+                    data.put(optionalKey, optionalValue);
                 }
             }
         }
