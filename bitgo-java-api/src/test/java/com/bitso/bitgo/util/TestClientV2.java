@@ -41,7 +41,7 @@ public class TestClientV2 {
     @Test
     @Ignore
     public void testSendMany() throws IOException {
-
+        Map<String, Object> parameters = new HashMap<String, Object>();
         int unlockResult = client.unlock("0000000", TimeUnit.HOURS.toSeconds(1));
         System.out.println(unlockResult);
         assertTrue(unlockResult != 400 && unlockResult != 401);
@@ -52,12 +52,53 @@ public class TestClientV2 {
             targets.put(TLTC_TEST_FAUCET_ADDRESS, amount);
             amount = amount.add(initAmount);
         }
-//        targets.put("[ADDRESS2]", new BigDecimal("0.001"));
-        Optional<SendCoinsResponse> resp = client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, null,
-                "test", null, null, 1, true);
+        parameters.put("message", "test");
+        parameters.put("minConfirms", 1);
+        parameters.put("enforceMinConfirmsForChange", true);
+        String sequenceId = ""; //Set it up for transaction to work
+        Optional<SendCoinsResponse> resp = client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, parameters);
         Assert.assertTrue(resp.isPresent());
         Assert.assertNotNull(resp.get().getTx());
 
+    }
+
+    @Test
+    @Ignore
+    public void testSendManyFail() throws IOException {
+        int unlockResult = client.unlock("0000000", TimeUnit.HOURS.toSeconds(1));
+        System.out.println(unlockResult);
+        assertTrue(unlockResult != 400 && unlockResult != 401);
+        Map<String, BigDecimal> targets = new HashMap<>();
+        BigDecimal initAmount = new BigDecimal("0.001").movePointRight(8);
+        BigDecimal amount = initAmount;
+        targets.put(TLTC_TEST_FAUCET_ADDRESS, amount);
+        String sequenceId = "123";
+        // Send required COIN parameter as empty
+        try {
+            client.sendMany("", WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, null);
+        } catch (Exception e) {
+            Assert.assertEquals("Invalid currency", e.getMessage());
+        }
+        // Send COIN  parameter  misformed
+        try {
+            client.sendMany("abc", WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, null);
+        } catch (Exception e) {
+            Assert.assertEquals("Invalid currency", e.getMessage());
+        }
+        // Send required COIN parameter as null
+        try {
+            client.sendMany(null, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, null);
+        } catch (Exception e) {
+            Assert.assertEquals("coin is marked @NonNull but is null", e.getMessage());
+        }
+        // Send an optional parameter with a wrong type
+        try {
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("fee", "0");
+            client.sendMany(COIN, WALLET_ID, WALLET_PASSPHRASE, targets, sequenceId, parameters);
+        } catch (Exception e) {
+            Assert.assertEquals("Fee should be a BigDecimal value", e.getMessage());
+        }
     }
 
     @Test
@@ -90,7 +131,7 @@ public class TestClientV2 {
 //        for (int i = 0; i < 30; i++) {
 //            resp.getTransfers().remove(0);
 //        }
-        System.out.println("resp json = "+ SerializationUtil.mapper.writeValueAsString(resp));
+        System.out.println("resp json = " + SerializationUtil.mapper.writeValueAsString(resp));
 
 
     }

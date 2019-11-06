@@ -8,6 +8,7 @@ import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,42 +105,90 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<SendCoinsResponse> sendMany(String coin, String walletId, String walletPass,
-                                                Map<String, BigDecimal> recipients,
-                                                String sequenceId, String message,
-                                                BigDecimal fee, BigDecimal feeTxConfirmTarget,
-                                                int minConfirms, boolean enforceMinConfirmsForChange)
-            throws IOException {
-        String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
+    public Optional<SendCoinsResponse> sendMany(@NonNull String coin, @NonNull String walletId, @NonNull String walletPass,
+                                                @NonNull Map<String, BigDecimal> recipients, @NonNull String sequenceId,
+                                                Map<String, Object> optionalParameters) throws IOException {
+        // Validate all needed parameters
+        if (coin.isBlank()) {
+            throw new IllegalArgumentException("Invalid currency");
+        }
+        if (walletId.isBlank()) {
+            throw new IllegalArgumentException("WalletId can't be empty");
+        }
+        if (walletPass.isBlank()) {
+            throw new IllegalArgumentException("WalletPass can't be empty ");
+        }
+        if (sequenceId.isBlank()) {
+            throw new IllegalArgumentException("SequenceId can't be empty");
+        }
+        if (recipients.size() == 0) {
+            throw new IllegalArgumentException("Transaction must have at least one address/amount tuple as destination");
+        }
 
+        String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
         final List<Map<String, Object>> addr = new ArrayList<>(recipients.size());
         for (Map.Entry<String, BigDecimal> e : recipients.entrySet()) {
             Map<String, Object> a = new HashMap<>(2);
             a.put("address", e.getKey());
-            a.put("amount", e.getValue().longValue());
+            a.put("amount", e.getValue().toBigInteger());
             addr.add(a);
         }
         final Map<String, Object> data = new HashMap<>();
         data.put("recipients", addr);
-        if (message != null) {
-            data.put("message", message);
+        data.put("walletPassphrase", walletPass);
+        data.put("sequenceId", sequenceId);
+
+        // Check for optional parameters or default them to null
+        if (optionalParameters != null) {
+            String optionalKey;
+            Object optionalValue;
+            for (Map.Entry<String, Object> currentParameter : optionalParameters.entrySet()) {
+                optionalKey = currentParameter.getKey();
+                optionalValue = currentParameter.getValue();
+                if (optionalKey.equals("message")) {
+                    if (optionalValue != null) {
+                        data.put(optionalKey, optionalValue.toString());
+                    }
+                } else if (optionalKey.equals("fee")) {
+                    if (optionalValue != null) {
+                        if (optionalValue instanceof BigDecimal) {
+                            data.put(optionalKey, ((BigDecimal) optionalValue).toBigInteger());
+                        } else {
+                            throw new IllegalArgumentException("Fee should be a BigDecimal value");
+                        }
+                    }
+                } else if (optionalKey.equals("feeTxConfirmTarget")) {
+                    if (optionalValue != null) {
+                        if (optionalValue instanceof BigDecimal) {
+                            data.put(optionalKey, optionalValue);
+                        } else {
+                            throw new IllegalArgumentException("FeeTxConfirmTarget should be a BigDecimal value");
+                        }
+                    }
+                } else if (optionalKey.equals("minConfirms")) {
+                    if (optionalValue != null) {
+                        if (optionalValue instanceof Integer && ((int) optionalValue > 0)) {
+                            data.put(optionalKey, optionalValue);
+                        } else {
+                            throw new IllegalArgumentException("MinConfirms should be an Integer value higher than 0");
+                        }
+                    }
+                } else if (optionalKey.equals("enforceMinConfirmsForChange")) {
+                    if (optionalValue != null) {
+                        if (optionalValue instanceof Boolean) {
+                            data.put(optionalKey, optionalValue);
+                        } else {
+                            throw new IllegalArgumentException("EnforceMinConfirmsForChange should be a Boolean value");
+                        }
+                    }
+                } else if (optionalValue != null) {
+                    // Unknown parameter for validation, if not null allow it to pass to the transaction request
+                    data.put(optionalKey, optionalValue);
+                }
+            }
         }
-        if (sequenceId != null) {
-            data.put("sequenceId", sequenceId);
-        }
-        if (fee != null) {
-            data.put("fee", fee.longValue());
-        }
-        if (feeTxConfirmTarget != null) {
-            data.put("feeTxConfirmTarget", feeTxConfirmTarget);
-        }
-        if (minConfirms > 0) {
-            data.put("minConfirms", minConfirms);
-        }
-        data.put("enforceMinConfirmsForChange", enforceMinConfirmsForChange);
 
         log.info("sendMany {}", data);
-        data.put("walletPassphrase", walletPass);
         HttpURLConnection conn = httpPost(url, data);
         if (conn == null) {
             return Optional.empty();

@@ -38,27 +38,26 @@ public interface BitGoClient {
     Optional<Wallet> getWalletByAddress(String coin, String waddress) throws IOException;
 
     /**
-     * Invokes the sendmany method see https://www.bitgo.com/api/v2/?shell#send-transaction-to-many
      *
-     * @param coin                        tbtc for test bitcoin, see full list at https://www.bitgo.com/api/v2/#coin-digital-currency-support
-     * @param walletId                    The ID of the source wallet.
-     * @param walletPass                  The wallet passphrase.
-     * @param recipients                  A map with the recipients' addresses as keys and the corresponding
-     *                                    amounts as values. Amounts are in satoshis
-     * @param sequenceId                  A unique identifier for this transaction (optional).
-     * @param message                     Notes about the transaction (optional).
-     * @param fee                         Fee (in satoshis), leave null for autodetect. Do not specify unless you are sure it is sufficient.
-     * @param feeTxConfirmTarget          Calculate fees per kilobyte, targeting transaction confirmation in this number of blocks. Default: 2, Minimum: 2, Maximum: 20
-     * @param minConfirms                 only choose unspent inputs with a certain number of confirmations. We recommend setting this to 1 and using enforceMinConfirmsForChange
-     * @param enforceMinConfirmsForChange Defaults to false. When constructing a transaction, minConfirms will only be enforced for unspents not originating from the wallet
+     * @param coin                  tbtc for test bitcoin, see full list at https://www.bitgo.com/api/v2/#coin-digital-currency-support
+     * @param walletId              The ID of the source wallet.
+     * @param walletPass            The wallet passphrase.
+     * @param recipients            A map with the recipients' addresses as keys and the corresponding
+     *                              amounts as values. Amounts are in satoshis
+     * @param sequenceId            A unique identifier for this transaction (optional).
+     * @param optionalParameters    A map with optional extra parameters.
+     * Some of the known optional parameters are:
+     * message                     Notes about the transaction.
+     * fee                         Fee (in satoshis), leave null for autodetect. Do not specify unless you are sure it is sufficient.
+     * feeTxConfirmTarget          Calculate fees per kilobyte, targeting transaction confirmation in this number of blocks. Default: 2, Minimum: 2, Maximum: 20
+     * minConfirms                 only choose unspent inputs with a certain number of confirmations. We recommend setting this to 1 and using enforceMinConfirmsForChange
+     * enforceMinConfirmsForChange Defaults to false. When constructing a transaction, minConfirms will only be enforced for unspents not originating from the wallet
      * @return A SendCoinsResponse, or empty if there was a problem (although more likely in case of a problem it will throw).
+     * @throws IOException
      */
     Optional<SendCoinsResponse> sendMany(String coin, String walletId, String walletPass,
-                                         Map<String, BigDecimal> recipients,
-                                         String sequenceId, String message,
-                                         BigDecimal fee, BigDecimal feeTxConfirmTarget,
-                                         int minConfirms, boolean enforceMinConfirmsForChange)
-            throws IOException;
+                                         Map<String, BigDecimal> recipients, String sequenceId,
+                                         Map<String, Object> optionalParameters) throws IOException;
 
     Optional<Map<String, Object>> getCurrentUserProfile() throws IOException;
 
