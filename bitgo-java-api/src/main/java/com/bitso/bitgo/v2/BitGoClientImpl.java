@@ -110,19 +110,19 @@ public class BitGoClientImpl implements BitGoClient {
                                                 Map<String, Object> optionalParameters) throws IOException {
         // Validate all needed parameters
         if (coin.isBlank()) {
-            throw new IOException("Invalid currency");
+            throw new IllegalArgumentException("Invalid currency");
         }
         if (walletId.isBlank()) {
-            throw new IOException("WalletId can't be empty");
+            throw new IllegalArgumentException("WalletId can't be empty");
         }
         if (walletPass.isBlank()) {
-            throw new IOException("WalletPass can't be empty ");
+            throw new IllegalArgumentException("WalletPass can't be empty ");
         }
         if (sequenceId.isBlank()) {
-            throw new IOException("SequenceId can't be empty");
+            throw new IllegalArgumentException("SequenceId can't be empty");
         }
         if (recipients.size() == 0) {
-            throw new IOException("Transaction must have at least one address/amount tuple as destination");
+            throw new IllegalArgumentException("Transaction must have at least one address/amount tuple as destination");
         }
 
         String url = baseUrl + SEND_MANY_URL.replace("$COIN", coin).replace("$WALLET", walletId);
@@ -154,7 +154,7 @@ public class BitGoClientImpl implements BitGoClient {
                         if (optionalValue instanceof BigDecimal) {
                             data.put(optionalKey, ((BigDecimal) optionalValue).toBigInteger());
                         } else {
-                            throw new IOException("Fee should be a BigDecimal value");
+                            throw new IllegalArgumentException("Fee should be a BigDecimal value");
                         }
                     }
                 } else if (optionalKey.equals("feeTxConfirmTarget")) {
@@ -162,7 +162,7 @@ public class BitGoClientImpl implements BitGoClient {
                         if (optionalValue instanceof BigDecimal) {
                             data.put(optionalKey, optionalValue);
                         } else {
-                            throw new IOException("FeeTxConfirmTarget should be a BigDecimal value");
+                            throw new IllegalArgumentException("FeeTxConfirmTarget should be a BigDecimal value");
                         }
                     }
                 } else if (optionalKey.equals("minConfirms")) {
@@ -170,7 +170,7 @@ public class BitGoClientImpl implements BitGoClient {
                         if (optionalValue instanceof Integer && ((int) optionalValue > 0)) {
                             data.put(optionalKey, optionalValue);
                         } else {
-                            throw new IOException("MinConfirms should be an Integer value higher than 0");
+                            throw new IllegalArgumentException("MinConfirms should be an Integer value higher than 0");
                         }
                     }
                 } else if (optionalKey.equals("enforceMinConfirmsForChange")) {
@@ -178,7 +178,7 @@ public class BitGoClientImpl implements BitGoClient {
                         if (optionalValue instanceof Boolean) {
                             data.put(optionalKey, optionalValue);
                         } else {
-                            throw new IOException("EnforceMinConfirmsForChange should be a Boolean value");
+                            throw new IllegalArgumentException("EnforceMinConfirmsForChange should be a Boolean value");
                         }
                     }
                 } else if (optionalValue != null) {
