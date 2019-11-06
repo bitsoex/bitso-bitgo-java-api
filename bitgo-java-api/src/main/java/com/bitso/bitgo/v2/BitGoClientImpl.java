@@ -109,16 +109,16 @@ public class BitGoClientImpl implements BitGoClient {
                                                 @NonNull Map<String, BigDecimal> recipients, @NonNull String sequenceId,
                                                 Map<String, Object> optionalParameters) throws IOException {
         // Validate all needed parameters
-        if (coin.isBlank()) {
+        if (coin.isEmpty()) {
             throw new IllegalArgumentException("Invalid currency");
         }
-        if (walletId.isBlank()) {
+        if (walletId.isEmpty()) {   
             throw new IllegalArgumentException("WalletId can't be empty");
         }
-        if (walletPass.isBlank()) {
+        if (walletPass.isEmpty()) {
             throw new IllegalArgumentException("WalletPass can't be empty ");
         }
-        if (sequenceId.isBlank()) {
+        if (sequenceId.isEmpty()) {
             throw new IllegalArgumentException("SequenceId can't be empty");
         }
         if (recipients.size() == 0) {
