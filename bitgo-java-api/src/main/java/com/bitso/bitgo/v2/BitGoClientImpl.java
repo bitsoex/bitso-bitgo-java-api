@@ -112,7 +112,7 @@ public class BitGoClientImpl implements BitGoClient {
         if (coin.isEmpty()) {
             throw new IllegalArgumentException("Invalid currency");
         }
-        if (walletId.isEmpty()) {   
+        if (walletId.isEmpty()) {
             throw new IllegalArgumentException("WalletId can't be empty");
         }
         if (walletPass.isEmpty()) {
@@ -151,16 +151,16 @@ public class BitGoClientImpl implements BitGoClient {
                     }
                 } else if (optionalKey.equals("fee")) {
                     if (optionalValue != null) {
-                        if (optionalValue instanceof BigDecimal) {
-                            data.put(optionalKey, ((BigDecimal) optionalValue).toBigInteger());
+                        if (optionalValue instanceof Number) {
+                            data.put(optionalKey, new BigDecimal(optionalValue.toString()).toBigInteger());
                         } else {
                             throw new IllegalArgumentException("Fee should be a BigDecimal value");
                         }
                     }
                 } else if (optionalKey.equals("feeTxConfirmTarget")) {
                     if (optionalValue != null) {
-                        if (optionalValue instanceof BigDecimal) {
-                            data.put(optionalKey, optionalValue);
+                        if (optionalValue instanceof Number) {
+                            data.put(optionalKey, new BigDecimal(optionalValue.toString()).toBigInteger());
                         } else {
                             throw new IllegalArgumentException("FeeTxConfirmTarget should be a BigDecimal value");
                         }
