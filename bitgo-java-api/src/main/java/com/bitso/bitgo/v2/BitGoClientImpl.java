@@ -160,7 +160,7 @@ public class BitGoClientImpl implements BitGoClient {
                 } else if (optionalKey.equals("feeTxConfirmTarget")) {
                     if (optionalValue != null) {
                         if (optionalValue instanceof Number) {
-                            data.put(optionalKey, optionalValue);
+                            data.put(optionalKey, new BigDecimal(optionalValue.toString()).toBigInteger());
                         } else {
                             throw new IllegalArgumentException("FeeTxConfirmTarget should be a BigDecimal value");
                         }
