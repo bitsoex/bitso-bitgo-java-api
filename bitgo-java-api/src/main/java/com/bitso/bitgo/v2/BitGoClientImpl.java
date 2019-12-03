@@ -135,7 +135,6 @@ public class BitGoClientImpl implements BitGoClient {
         }
         final Map<String, Object> data = new HashMap<>();
         data.put("recipients", addr);
-        data.put("walletPassphrase", walletPass);
         data.put("sequenceId", sequenceId);
 
         // Check for optional parameters or default them to null
@@ -189,6 +188,7 @@ public class BitGoClientImpl implements BitGoClient {
         }
 
         log.info("sendMany {}", data);
+        data.put("walletPassphrase", walletPass);
         HttpURLConnection conn = httpPost(url, data);
         if (conn == null) {
             return Optional.empty();
