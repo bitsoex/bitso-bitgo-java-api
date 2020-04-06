@@ -238,17 +238,23 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public WalletTransferResponse listWalletTransfers(String coin, String walletId, String prevId, int limit) throws IOException {
+    public WalletTransferResponse listWalletTransfers(String coin, String walletId, String prevId, int limit, Map<String, Object> optionalParameters) throws IOException {
         if (limit > 250) limit = 250;
         if (limit < 0) limit = 0;
         String url = baseUrl + LIST_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId) + "?limit=" + limit;
 
-        Map<String, String> reqPropMap = null;
+        Map<String, String> props = null;
         if (prevId != null) {
-            reqPropMap = new HashMap<>();
-            reqPropMap.put("prevId", prevId);
+            props = new HashMap<>();
+            props.put("prevId", prevId);
         }
-        HttpURLConnection conn = httpGetRetry500(url, reqPropMap);
+        if (optionalParameters != null && optionalParameters.size() > 0) {
+            if (props == null) props = new HashMap<>();
+            for (final Map.Entry<String, Object> entry : optionalParameters.entrySet()) {
+                props.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        HttpURLConnection conn = httpGetRetry500(url, props);
 
         final WalletTransferResponse resp = SerializationUtil.mapper.readValue(conn.getInputStream(), WalletTransferResponse.class);
         log.trace("listWalletTransactions response: {}", resp);
