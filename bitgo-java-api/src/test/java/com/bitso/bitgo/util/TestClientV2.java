@@ -23,6 +23,8 @@ import static junit.framework.TestCase.assertTrue;
 /**
  * Simple client tests.
  *
+ * docker run -it -p 3080:3080 bitgosdk/express:latest
+ *
  * @author Enrique Zamudio
  * Date: 5/8/17 8:04 PM
  */
@@ -124,9 +126,9 @@ public class TestClientV2 {
 
     @Test
     public void listWalletTransfers() throws IOException {
-        final WalletTransferResponse resp = client.listWalletTransfers(COIN, WALLET_ID, null, 250);
+        final WalletTransferResponse resp = client.listWalletTransfers(COIN, WALLET_ID, null, 250, Map.of("dateGte", 1536189990165L));
         System.out.println("list.size() = " + resp.getTransfers().size());
-        assertTrue(resp.getTransfers().size() > 10);
+        assertTrue(resp.getTransfers().size() == 3);
 //        System.out.println(resp);
 //        for (int i = 0; i < 30; i++) {
 //            resp.getTransfers().remove(0);

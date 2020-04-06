@@ -83,7 +83,7 @@ public interface BitGoClient {
     Optional<Map<String, Object>> getWalletTransferSeqId(String coin, String walletId, String sequenceId) throws IOException;
 
     /**
-     * See https://www.bitgo.com/api/v2/#list-wallet-transactions
+     * See https://www.bitgo.com/api/v2/#operation/v2.wallet.listtransfers
      *
      * @param coin
      * @param walletId
@@ -92,7 +92,7 @@ public interface BitGoClient {
      * @return
      * @throws IOException
      */
-    WalletTransferResponse listWalletTransfers(String coin, String walletId, String nextBatchPrevId, int limit) throws IOException;
+    WalletTransferResponse listWalletTransfers(String coin, String walletId, String nextBatchPrevId, int limit, Map<String, Object> optionalParameters) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#unlock
