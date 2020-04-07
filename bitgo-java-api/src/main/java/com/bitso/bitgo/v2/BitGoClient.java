@@ -1,6 +1,7 @@
 package com.bitso.bitgo.v2;
 
 import com.bitso.bitgo.v2.entity.SendCoinsResponse;
+import com.bitso.bitgo.v2.entity.Transfer;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 
@@ -66,11 +67,11 @@ public interface BitGoClient {
      *
      * @param coin
      * @param walletId
-     * @param walletTransferId
+     * @param txid
      * @return
      * @throws IOException
      */
-    Optional<Map<String, Object>> getWalletTransferId(String coin, String walletId, String walletTransferId) throws IOException;
+    Optional<Transfer> getWalletTransferId(String coin, String walletId, String txid) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#get-wallet-transfer-by-sequence-id

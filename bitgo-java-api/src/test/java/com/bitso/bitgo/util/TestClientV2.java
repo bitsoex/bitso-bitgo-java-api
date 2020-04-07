@@ -3,6 +3,7 @@ package com.bitso.bitgo.util;
 import com.bitso.bitgo.v2.BitGoClient;
 import com.bitso.bitgo.v2.BitGoClientImpl;
 import com.bitso.bitgo.v2.entity.SendCoinsResponse;
+import com.bitso.bitgo.v2.entity.Transfer;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -134,7 +135,12 @@ public class TestClientV2 {
 //            resp.getTransfers().remove(0);
 //        }
         System.out.println("resp json = " + SerializationUtil.mapper.writeValueAsString(resp));
+    }
 
-
+    @Test
+    public void getWalletTransfers() throws IOException {
+        final Optional<Transfer> resp = client.getWalletTransferId(COIN, WALLET_ID, "cdaa330f5717556d873506ee5bb283b3703f9b2a73899577ce3530ae2c75e0ea");
+        System.out.println("resp = " + resp.get());
+        System.out.println("resp json = " + SerializationUtil.mapper.writeValueAsString(resp.get()));
     }
 }
