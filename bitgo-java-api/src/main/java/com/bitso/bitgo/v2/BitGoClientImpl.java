@@ -4,6 +4,7 @@ import com.bitso.bitgo.util.HttpHelper;
 import com.bitso.bitgo.util.SerializationUtil;
 import com.bitso.bitgo.v2.entity.ListWalletResponse;
 import com.bitso.bitgo.v2.entity.SendCoinsResponse;
+import com.bitso.bitgo.v2.entity.Transfer;
 import com.bitso.bitgo.v2.entity.Wallet;
 import com.bitso.bitgo.v2.entity.WalletTransferResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -217,13 +218,12 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Optional<Map<String, Object>> getWalletTransferId(String coin, String walletId, String walletTransferId) throws IOException {
+    public Transfer getWalletTransferId(String coin, String walletId, String walletTransferId) throws IOException {
         String url = baseUrl + GET_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$TRANSFER", walletTransferId);
         HttpURLConnection conn = httpGet(url);
-        Map<String, Object> resp = SerializationUtil.mapper.readValue(conn.getInputStream(), new TypeReference<Map<String, Object>>() {
-        });
+        Transfer resp = SerializationUtil.mapper.readValue(conn.getInputStream(), Transfer.class);
         log.trace("getWalletTransferId response: {}", resp);
-        return Optional.of(resp);
+        return resp;
     }
 
     @Override
@@ -260,6 +260,8 @@ public class BitGoClientImpl implements BitGoClient {
         log.trace("listWalletTransactions response: {}", resp);
         return resp;
     }
+
+
 
     @Override
     public int unlock(String otp, Long durationSecs) throws IOException {
