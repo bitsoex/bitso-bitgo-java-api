@@ -218,12 +218,12 @@ public class BitGoClientImpl implements BitGoClient {
     }
 
     @Override
-    public Transfer getWalletTransferId(String coin, String walletId, String txid) throws IOException {
+    public Optional<Transfer> getWalletTransferId(String coin, String walletId, String txid) throws IOException {
         String url = baseUrl + GET_WALLET_TRANSFER_URL.replace("$COIN", coin).replace("$WALLET", walletId).replace("$TRANSFER", txid);
         HttpURLConnection conn = httpGet(url);
         Transfer resp = SerializationUtil.mapper.readValue(conn.getInputStream(), Transfer.class);
         log.trace("getWalletTransferId response: {}", resp);
-        return resp;
+        return Optional.of(resp);
     }
 
     @Override

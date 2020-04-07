@@ -139,12 +139,14 @@ public class TestClientV2 {
 
     @Test
     public void getWalletTransfers() throws IOException {
-        final Transfer resp = client.getWalletTransferId(COIN, WALLET_ID, "cdaa330f5717556d873506ee5bb283b3703f9b2a73899577ce3530ae2c75e0ea");
-        System.out.println("resp = " + resp);
-//        System.out.println(resp);
-//        for (int i = 0; i < 30; i++) {
-//            resp.getTransfers().remove(0);
+//        try {
+//            final Optional<Transfer> respBad = client.getWalletTransferId(COIN, WALLET_ID, "zzz");
+//        }catch (IOException e){
+//            e.printStackTrace();;
 //        }
-        System.out.println("resp json = " + SerializationUtil.mapper.writeValueAsString(resp));
+
+        final Optional<Transfer> resp = client.getWalletTransferId(COIN, WALLET_ID, "cdaa330f5717556d873506ee5bb283b3703f9b2a73899577ce3530ae2c75e0ea");
+        System.out.println("resp = " + resp.get());
+        System.out.println("resp json = " + SerializationUtil.mapper.writeValueAsString(resp.get()));
     }
 }

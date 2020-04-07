@@ -71,7 +71,7 @@ public interface BitGoClient {
      * @return
      * @throws IOException
      */
-    Transfer getWalletTransferId(String coin, String walletId, String txid) throws IOException;
+    Optional<Transfer> getWalletTransferId(String coin, String walletId, String txid) throws IOException;
 
     /**
      * See https://www.bitgo.com/api/v2/?shell#get-wallet-transfer-by-sequence-id
