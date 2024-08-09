@@ -9,7 +9,7 @@ jobs:
               GITHUB_TOKEN: ${{secrets.SVC_SNYK_TOKEN}}
               SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
             name: Run Snyk to check for vulnerabilities
-            uses: snyk/actions/gradle@4a528b5c534bb771b6e3772656a8e0e9dc902f8b
+            uses: snyk/actions/gradle-jdk17@8349f9043a8b7f0f3ee8885bf28f0b388d2446e8
             with:
               args: --detection-depth=5 --all-sub-projects
               command: monitor
