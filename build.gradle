@@ -1,0 +1,10 @@
+plugins {
+    id "io.snyk.gradle.plugin.snykplugin" version "0.4"
+}
+
+snyk {
+    severity = 'medium'
+    autoDownload = true
+    autoUpdate = true
+    arguments = '--all-sub-projects --configuration-matching=compile'
+}
